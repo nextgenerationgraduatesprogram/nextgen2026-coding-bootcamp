@@ -11,6 +11,8 @@ __pycache__/
 
 # Distribution / packaging
 .Python
+results/*
+!results/.gitkeep
 build/
 develop-eggs/
 dist/
@@ -38,21 +40,6 @@ MANIFEST
 # Installer logs
 pip-log.txt
 pip-delete-this-directory.txt
-
-# Unit test / coverage reports
-htmlcov/
-.tox/
-.nox/
-.coverage
-.coverage.*
-.cache
-nosetests.xml
-coverage.xml
-*.cover
-*.py.cover
-.hypothesis/
-.pytest_cache/
-cover/
 
 # Translations
 *.mo
@@ -208,3 +195,6 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# SIF
+*.sif

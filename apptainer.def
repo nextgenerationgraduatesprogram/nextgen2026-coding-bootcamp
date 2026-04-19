@@ -1,0 +1,33 @@
+Bootstrap: docker
+From: python:3.10-slim
+
+%files
+    . /app
+
+%post
+    set -eux
+    cd /app
+
+    python -m pip install --no-cache-dir --upgrade pip
+    python -m pip install --no-cache-dir uv
+
+    export UV_LINK_MODE=copy
+    export UV_COMPILE_BYTECODE=1
+    export UV_NO_DEV=1
+
+    uv sync --locked --no-editable
+
+%environment
+    export UV_LINK_MODE=copy
+    export UV_COMPILE_BYTECODE=1
+    export UV_NO_DEV=1
+    export PATH=/app/.venv/bin:/usr/local/bin:$PATH
+
+%runscript
+    cd /app
+    exec uv run --no-sync --frozen hello "$@"
+
+%test
+    cd /app
+    uv --version
+    test -x /app/.venv/bin/python
