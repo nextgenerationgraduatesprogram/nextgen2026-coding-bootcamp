@@ -1,5 +1,7 @@
 # Coding Agent Instructions & Rules
 
+> **IMPORTANT**: Every new AI session MUST start by reading this file and following the instructions in Section 4 (Version Control & Session Management).
+
 This document outlines the architectural and workflow rules for any AI agent assisting with the `nextgen2026-coding-bootcamp` repository.
 
 ## 1. Environment & Dependency Management
@@ -25,7 +27,8 @@ This document outlines the architectural and workflow rules for any AI agent ass
 - **Session Start**: At the beginning of a session, always:
     1. Check `git status`.
     2. Check the current branch state.
-    3. Create a new working branch with the current date appended (e.g., `feature-name-2026-04-20`).
+    3. `git fetch upstream` to check for new session branches (e.g., `starter/session-2`).
+    4. Switch to the relevant session branch or create a specific feature branch if requested.
 - **Commits**: Make small, logical commits. Use prefixing (e.g., `feat:`, `fix:`, `build:`, `docs:`) as per Conventional Commits where possible.
 - **Ignored Files**: Ensure local artifacts like `.venv/`, `__pycache__/`, and `dist/` are never committed.
 - **Lockfiles**: Always commit `uv.lock`.
