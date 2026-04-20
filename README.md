@@ -1,39 +1,50 @@
-# NextGen Coding Bootcamp 2026
+# NextGen Coding Bootcamp
 
-Welcome to the NextGen Coding Bootcamp. This repository provides a structured workflow for building reproducible computational research projects.
+This four-session boot camp introduces the core workflow skills needed to run a computational research project from setup to reproducible handoff. We will learn how to structure a research repository, run analyses through scripts and configuration, capture logs and outputs, use coding tools such as Copilot to accelerate development, and produce work that another researcher can rerun, review, and extend.
 
-## 🚀 Quick Start: Onboarding
+## Before Session 1
 
-Whether you are working manually or with an AI coding agent (like GitHub Copilot), follow these steps to set up your environment.
+Whether you are working manually or with an AI coding agent, follow these steps to set up your environment.
 
-### 1. Prerequisites
-- **Git**: [Install Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
-- **Python 3.11+**: [Download Python](https://www.python.org/downloads/)
-- **uv**: We use `uv` for lightning-fast package and environment management.
+- [ ] **Install VS Code**
+- [ ] **Windows only**: install [WSL and Ubuntu 24.04](https://apps.microsoft.com/store/detail/ubuntu-2404-lts/9P7N5RW865B8)
+- [ ] **Install the VS Code `WSL` and `Python` extensions**
+- [ ] **Install Git, Python 3.11+, and `uv`**
+  - **uv** (Recommended): `curl -LsSf https://astral.sh/uv/install.sh | sh`
+- [ ] **Fork & Clone** this repository:
   ```bash
-  # macOS/Linux
-  curl -LsSf https://astral.sh/uv/install.sh | sh
-  # Windows (PowerShell)
-  powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
+  git clone https://github.com/<your-username>/nextgen2026-coding-bootcamp.git
+  cd nextgen2026-coding-bootcamp
+  git remote add upstream https://github.com/nextgenerationgraduatesprogram/nextgen2026-coding-bootcamp.git
   ```
+- [ ] **Set your Git name and email**
+- [ ] **Initialize the environment**: `uv sync`
 
-### 2. Fork & Clone
-1. **Fork** this repository to your own GitHub account.
-2. **Clone** your fork:
-   ```bash
-   git clone https://github.com/<your-username>/nextgen2026-coding-bootcamp.git
-   cd nextgen2026-coding-bootcamp
-   ```
-3. **Add Upstream**: Keep your fork in sync with the original repo.
-   ```bash
-   git remote add upstream https://github.com/nextgenerationgraduatesprogram/nextgen2026-coding-bootcamp.git
-   ```
+See **[Development Environment Setup](./docs/00-development-environment.md)** for detailed checks.
 
-### 3. Environment Setup
-Initialize the project environment and install dependencies:
+## Session Branches
+
+This repository uses separate branches for each session.
+
+- `starter/session-<n>`: starting point for the session
+- `solutions/session-<n>`: completed reference version for the session
+
+To begin a session, switch to its starter branch:
+
 ```bash
-uv sync
+git switch starter/session-1
 ```
+
+## Learning Objectives
+
+By the end of the boot camp, we will be able to:
+
+- set up a clean research code repository with a sensible project structure, isolated environment, and version control
+- run analyses from scripts and configuration files rather than relying on notebook cell order
+- capture logs, outputs, and artifacts in a way that supports reproducibility and debugging
+- write and run basic tests to make research code safer to change
+- use AI coding tools productively through spec-driven development, documentation, and review
+- package a small research project so that another person can clone it, run it, and understand how results were produced
 
 ---
 
@@ -48,12 +59,6 @@ If you are using an AI agent (e.g., GitHub Copilot, Cursor), please direct it to
 - Reproducible notebooks that import from the package.
 - Safe, non-destructive command execution.
 
-### 📅 Session Workflow
-For every new session or task, the agent should:
-1. Sync with `upstream`.
-2. Check `git status`.
-3. Create a date-stamped feature branch (e.g., `session-1-analysis-2026-04-20`).
-
 ---
 
 ## 📚 Repository Structure
@@ -63,14 +68,6 @@ For every new session or task, the agent should:
 - `notebooks/`: Exploratory analysis and visualization.
 - `data/raw/`: Read-only input data.
 - `results/`: Generated outputs (ignored by Git, except for `.gitkeep`).
-- `docs/`: Step-by-step session guides.
-
-## 🛠 Useful Commands
-
-- **Run Visualization**: `uv run viz`
-- **Run Hello World**: `uv run hello`
-- **Start Jupyter**: `uv run --with jupyterlab jupyter lab`
-- **Build Package**: `uv build`
 
 ## 📖 Session Guides
 - If you are on the **main branch**: Start with the **[Development Environment Setup](./docs/00-development-environment.md)**.
