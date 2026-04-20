@@ -19,6 +19,9 @@ This document outlines the architectural and workflow rules for any AI agent ass
 - **Paths**: Use `Path(__file__).resolve()` or relative path logic rooted in the project structure. Do not use hardcoded absolute paths.
 
 ## 4. Version Control & Session Management
+- **Syncing Upstream**: Before starting a new session, ensure the fork is synced:
+    1. `git fetch upstream`
+    2. `git merge upstream/main` (on the main branch)
 - **Session Start**: At the beginning of a session, always:
     1. Check `git status`.
     2. Check the current branch state.
