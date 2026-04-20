@@ -8,7 +8,7 @@ The purpose is to make reproducibility explicit before any refactoring work begi
 
 This section defines the session-level success criteria and operating assumptions that all later chapters depend on. Treat these as acceptance criteria for methodological readiness, not optional checklist items.
 
-By the end of the core path (`00`-`07`), students should be able to:
+By the end of the core path (`00`-`07`), we will should be able to:
 
 1. run the full workflow with explicit configuration;
 2. recover exactly what happened in a run from durable files;
@@ -46,16 +46,15 @@ uv run python -c "import pandas, omegaconf, matplotlib, pytest; print('env-ok')"
 
 ### Step 3: Confirm session assumptions
 
-For this course delivery, students enter with `fetch` and `prepare` already implemented. The core teaching focus is how to make `analyze` and downstream execution reproducible.
+For this course delivery, we will enter with `fetch` and `prepare` already implemented. The core teaching focus is implementing `analyze` and downstream reproducibility controls in later chapters.
 
 ## 4. Run Checkpoint
 
-Use this checkpoint to verify that the prewritten `fetch` and `prepare` assumptions hold and that `analyze` is runnable on real data. Passing this run confirms the teaching baseline for the rest of the session.
+Use this checkpoint to verify that the prewritten `fetch` and `prepare` assumptions hold. Passing this run confirms the teaching baseline for the rest of the session.
 
 ```bash
 uv run python scripts/00_fetch.py --config configs/stages/fetch.yaml
 uv run python scripts/01_prepare.py --config configs/stages/prepare.yaml
-uv run python scripts/02_analyze.py --config configs/stages/analyze.yaml
 ```
 
 ## 5. Transition

@@ -1,4 +1,0 @@
-paths:
-  raw_dir: data/raw
-  intermediate_dir: data/intermediate
-  results_dir: results

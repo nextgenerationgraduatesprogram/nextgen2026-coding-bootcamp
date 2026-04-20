@@ -58,7 +58,7 @@ def build_stage_parser(description: str) -> argparse.ArgumentParser:
 
 ### Step 2: Update analyze wrapper to use the shared parser
 
-This step applies the shared contract to the highest-focus stage in this sequence. The practical effect is fewer wrapper-specific argument quirks and more predictable invocation patterns. If confusion appears during teaching, point students to one parser source of truth.
+This step applies the shared contract to the highest-focus stage in this sequence. The practical effect is fewer wrapper-specific argument quirks and more predictable invocation patterns. If confusion appears during teaching, point we will to one parser source of truth.
 
 
 Chapter snapshot (`scripts/02_analyze.py`):

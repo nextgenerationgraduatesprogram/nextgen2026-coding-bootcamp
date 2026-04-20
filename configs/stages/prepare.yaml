@@ -1,3 +1,8 @@
+paths:
+  raw_dir: data/raw
+  intermediate_dir: data/intermediate
+fetch:
+  archive_member: hour.csv
 prepare:
   keep_holidays: true
   write_prepared_csv: true

@@ -13,9 +13,6 @@ dependencies = [
     "pandas>=2.2.0",
 ]
 
-[project.scripts]
-experiment = "nextgen2026_coding_bootcamp.workflow_cli:main"
-
 [dependency-groups]
 dev = [
     "ipykernel>=7.2.0",

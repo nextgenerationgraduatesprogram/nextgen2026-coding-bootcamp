@@ -1,11 +1,8 @@
 from __future__ import annotations
 
 from pathlib import Path
-import logging
 
 import pandas as pd
-
-logger = logging.getLogger(__name__)
 
 SEASON_MAP = {1: "winter", 2: "spring", 3: "summer", 4: "fall"}
 WEATHER_MAP = {
@@ -36,29 +33,11 @@ PREPARED_COLUMNS = [
 ]
 
 
-def _resolve_input_csv(cfg, ctx=None, input_csv: Path | None = None) -> Path:
-    if input_csv is not None:
-        return input_csv
+def run_prepare(cfg) -> dict:
+    source_csv = Path(cfg.paths.raw_dir) / str(cfg.fetch.archive_member)
 
-    if ctx is not None:
-        fetch_artifact = ctx.artifacts.get("fetch", {})
-        fetch_csv = fetch_artifact.get("raw_csv")
-        if fetch_csv:
-            return Path(fetch_csv)
-
-    return Path(cfg.paths.raw_dir) / str(cfg.fetch.archive_member)
-
-
-def run_prepare(cfg, ctx=None, input_csv: Path | None = None) -> dict:
-    source_csv = _resolve_input_csv(cfg=cfg, ctx=ctx, input_csv=input_csv)
-
-    if ctx is None:
-        stage_output_dir = Path(cfg.paths.intermediate_dir)
-    else:
-        stage_output_dir = ctx.run_dir / "prepare"
-    stage_output_dir.mkdir(parents=True, exist_ok=True)
-
-    logger.info("prepare:start input=%s", source_csv)
+    output_dir = Path(cfg.paths.intermediate_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
 
     raw = pd.read_csv(source_csv, parse_dates=["dteday"])
     keep_holidays = bool(cfg.prepare.keep_holidays)
@@ -100,21 +79,13 @@ def run_prepare(cfg, ctx=None, input_csv: Path | None = None) -> dict:
         .rename(columns={"hr": "hour", "mnth": "month"})
     )
 
-    output_csv = stage_output_dir / "hourly_bike_data.csv"
-    wrote_prepared_csv = bool(cfg.prepare.write_prepared_csv)
-    if wrote_prepared_csv:
+    output_csv = output_dir / "hourly_bike_data.csv"
+    write_prepared_csv = bool(cfg.prepare.write_prepared_csv)
+    if write_prepared_csv:
         prepared.to_csv(output_csv, index=False)
         output_path = str(output_csv)
     else:
         output_path = None
-
-    logger.info(
-        "prepare:finish rows_in=%d rows_out=%d keep_holidays=%s wrote_csv=%s",
-        len(raw),
-        len(prepared),
-        keep_holidays,
-        wrote_prepared_csv,
-    )
 
     return {
         "raw_csv": str(source_csv),

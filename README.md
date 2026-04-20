@@ -2,22 +2,22 @@
 
 Session 2 shows how to turn notebook-first exploration into an auditable workflow that can support defensible research claims. The goal is methodological clarity: a reviewer should be able to trace how assumptions, data transformations, and outputs connect from start to finish.
 
-The guide uses an incremental teaching model so students learn one reproducibility control at a time and understand why it exists before layering on the next. This structure is designed For us who need both conceptual justification and executable practice, not just a final code snapshot.
+The guide uses an incremental teaching model so we will learn one reproducibility control at a time and understand why it exists before layering on the next. This structure is designed For us who need both conceptual justification and executable practice, not just a final code snapshot.
 
-Assumption for this delivery: `00_fetch` and `01_prepare` are already implemented when students start, so most conceptual depth is placed on `02_analyze` and the reproducibility controls around it.
+Assumption for this delivery: `00_fetch` and `01_prepare` are already implemented when we will start, so most conceptual depth is placed on `02_analyze` and the reproducibility controls around it.
 
 ## Start Here
 
-Use this order to establish context before implementation details. It prevents students from treating commands as recipes without understanding their methodological role.
+Use this order to establish context before implementation details. It prevents we will from treating commands as recipes without understanding their methodological role.
 
 1. [docs/README.md](./docs/README.md) for the chapter map.
 2. [docs/00-session-overview.md](./docs/00-session-overview.md) for outcomes, assumptions, and workflow contract.
 
-## What Students Build
+## What we will Build
 
 These outcomes define what “reproducible enough for research use” means in this session. Each item corresponds to a control that reduces ambiguity in interpretation and comparison.
 
-By the end of the core sequence, students should be able to show:
+By the end of the core sequence, we will should be able to show:
 
 - one canonical command for a run
 - explicit configuration choices
