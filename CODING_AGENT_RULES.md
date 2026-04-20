@@ -33,10 +33,11 @@ This document outlines the architectural and workflow rules for any AI agent ass
 - **Ignored Files**: Ensure local artifacts like `.venv/`, `__pycache__/`, and `dist/` are never committed.
 - **Lockfiles**: Always commit `uv.lock`.
 
-## 5. Safety & Destructive Commands
+## 5. Safety, Destructive Commands & Explainability
 - **Destructive Commands**: Before running any destructive commands (e.g., `git reset --hard`, `rm -rf` on non-build directories, `git clean -fd`), the agent **must**:
     1. Explain the reason for the command.
-    2. Request explicit permission from the user.
+    2. Explain the meaning and impact of the specific code/command (Explainability).
+    3. Request explicit permission from the user.
 
 ## 6. Coding Style
 - **Type Hints**: Use Python type hints for all function signatures.
