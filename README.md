@@ -73,4 +73,5 @@ For every new session or task, the agent should:
 - **Build Package**: `uv build`
 
 ## 📖 Session Guides
-Start with **[Session 1 Overview](./docs/session-overview.md)** to begin the bootcamp.
+- If you are on the **main branch**: Start with the **[Development Environment Setup](./docs/00-development-environment.md)**.
+- If you are on a **session branch**: Start with the **[Session 1 Overview](./docs/session-overview.md)** (or the relevant session doc).
