@@ -9,10 +9,16 @@ __pycache__/
 # Codex extensions
 .codex
 
+# Data
+data/raw/*
+!data/raw/.gitkeep
+
 # Distribution / packaging
 .Python
 results/*
 !results/.gitkeep
+runs/*
+!runs/.gitkeep
 build/
 develop-eggs/
 dist/
@@ -30,6 +36,10 @@ share/python-wheels/
 .installed.cfg
 *.egg
 MANIFEST
+.pytest_cache/
+.coverage
+.coverage.*
+.cache
 
 # PyInstaller
 #  Usually these files are written by a python script from a template

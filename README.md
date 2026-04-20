@@ -1,50 +1,64 @@
-# Session 1 - Build the Research Repo
+# Session 2 - Reproducible Research Workflow
 
-This branch is the completed Session 1 reference state. It shows a small research repo with one official run path, reusable code in `src/`, thin scripts, and a notebook that imports project code instead of replacing it.
+Session 2 shows how to turn notebook-first exploration into an auditable workflow that can support defensible research claims. The goal is methodological clarity: a reviewer should be able to trace how assumptions, data transformations, and outputs connect from start to finish.
 
-If you are working through the session step by step, start with `docs/session-overview.md`.
+The guide uses an incremental teaching model so students learn one reproducibility control at a time and understand why it exists before layering on the next. This structure is designed For us who need both conceptual justification and executable practice, not just a final code snapshot.
 
-## Official Commands
+Assumption for this delivery: `00_fetch` and `01_prepare` are already implemented when students start, so most conceptual depth is placed on `02_analyze` and the reproducibility controls around it.
 
-Run the small demonstration command:
+## Start Here
 
-```bash
-uv run hello
-```
+Use this order to establish context before implementation details. It prevents students from treating commands as recipes without understanding their methodological role.
 
-Run the example workflow that writes results:
+1. [docs/README.md](./docs/README.md) for the chapter map.
+2. [docs/00-session-overview.md](./docs/00-session-overview.md) for outcomes, assumptions, and workflow contract.
 
-```bash
-uv run viz
-```
+## What Students Build
 
-Run the thin script that prints the summary through an import from `src/`:
+These outcomes define what “reproducible enough for research use” means in this session. Each item corresponds to a control that reduces ambiguity in interpretation and comparison.
 
-```bash
-uv run python scripts/show_summary.py
-```
+By the end of the core sequence, students should be able to show:
 
-## Guide
+- one canonical command for a run
+- explicit configuration choices
+- durable runtime logs
+- run-scoped artifacts and a manifest
+- automated tests that protect analytical behavior and provenance
 
-Work through the Session 1 docs in order:
+Core run contract:
 
-- `docs/session-overview.md` for the overview and branch setup
-- `docs/00-project-demo.md` to preview the finished repo
-- `docs/01-project-initialization.md` to `docs/09-project-build.md` for the core build sequence
-- `docs/10-docker-containers.md` and `docs/11-apptainer-containers.md` for optional appendices
+`config -> command -> log -> artifacts -> manifest -> tests`
 
-## Repository Map
+## Core Path
 
-- `src/nextgen2026_coding_bootcamp/`: reusable project code
-- `scripts/`: thin operational helpers
-- `notebooks/`: exploratory work that imports project code
-- `data/raw/`: input data for the example workflow
-- `results/`: generated outputs from the workflow
-- `docs/`: the Session 1 student guide and appendices
+Follow the core path in sequence because each chapter introduces prerequisites for the next. Skipping ahead usually creates hidden gaps in provenance controls.
 
-## Learning Objectives
+1. [Session Overview](./docs/00-session-overview.md)
+2. [Project Structure](./docs/01-project-structure.md)
+3. [Configuration](./docs/02-config.md)
+4. [Command-Line Interface](./docs/03-cli.md)
+5. [Logging and Observability](./docs/04-observability.md)
+6. [Traceable Runs](./docs/05-traceability.md)
+7. [Workflow Orchestration](./docs/06-orchestration.md)
+8. [Testing the Workflow](./docs/07-testing.md)
 
-- build a packaged research repo from a sparse starter state
-- manage runtime and development dependencies with `uv`
-- keep reusable logic in `src/`
-- separate the official workflow from scripts and notebooks
+## Appendices
+
+Use appendices only after the core path is stable. They scale or operationalize the workflow contract, but they do not replace core reproducibility fundamentals.
+
+9. [Experiment Tracking](./docs/08-appendix-experiment-tracking.md)
+10. [Workflow Engines](./docs/09-appendix-workflow-engines.md)
+11. [Multiruns](./docs/10-appendix-multiruns.md)
+12. [Hydra](./docs/11-appendix-hydra.md)
+13. [Automated Testing on Git Push](./docs/12-appendix-git-push-testing.md)
+
+## How To Read This Repo
+
+Treat the repository as a training scaffold for research workflow design, not as a static template. The discipline is to validate each checkpoint before moving forward so methodological assumptions remain explicit.
+
+Treat each chapter as a checkpointed method lesson:
+
+- read rationale first
+- implement the chapter snapshot
+- run the checkpoint commands
+- move forward only after the checkpoint passes
