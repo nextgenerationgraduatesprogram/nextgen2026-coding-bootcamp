@@ -64,3 +64,9 @@ git status
 `pwd` should start with `/home/`.
 
 If the repo path starts with `/mnt/c/`, move back to `~/work`, clone the repo again there, and reopen that copy in VS Code.
+
+## Optional next step: submit work for review
+
+Once you have completed work on your own session branch, you can optionally submit it for instructor review from a fork on GitHub.
+
+See [Submit Work for Review](./05-submit-work-for-review.md) for the step-by-step fork, push, and pull request workflow.
