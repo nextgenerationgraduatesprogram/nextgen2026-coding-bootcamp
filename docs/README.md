@@ -38,7 +38,7 @@ The important point is that templates remain canonical blanks in `agents/templat
    Turn the approved brief into the implementation handoff, plan-review loop, and bounded commit rhythm.
 7. [06 — Verification and Decision](./06-verification.md)
    Ask the agent to draft the review-and-decision record from real evidence and use it to gate fix / commit / merge choices.
-8. [08 — Refinement and Hardening](./08-refinement.md)
+8. [07 — Refinement and Hardening](./07-refinement.md)
    Ask the agent to draft the hardening note for durable repo improvements.
 
 Read the guides in order. The early documents are about choosing and shaping the task; the middle documents are about briefing and supervising the agent; the later documents are about review, integrated git discipline, and turning one session into better future practice.

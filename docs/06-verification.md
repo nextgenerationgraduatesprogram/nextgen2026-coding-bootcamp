@@ -86,4 +86,4 @@ This is where students should clean up mistakes while the work is still isolated
 
 ## Next
 
-Continue to [08 — Refinement and Hardening](./08-refinement.md).
+Continue to [07 — Refinement and Hardening](./07-refinement.md).

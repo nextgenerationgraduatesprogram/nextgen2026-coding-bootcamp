@@ -1,5 +1,0 @@
-date,hour,season,month,weekday,holiday,workingday,day_type,weather,temp_c,feels_like_c,humidity_pct,windspeed_kph,casual,registered,total_rentals
-2011-01-01,8,winter,1,6,0,0,non_working_day,clear,4.99,3.01,81.0,0.0,3,7,10
-2011-01-03,8,spring,1,1,0,1,working_day,mist_cloud,5.00,2.00,80.0,6.7,8,12,20
-2011-01-03,9,spring,1,1,0,1,working_day,mist_cloud,15.00,2.00,80.0,6.7,12,18,30
-2011-01-03,10,summer,1,1,0,1,working_day,clear,25.00,2.00,80.0,6.7,15,25,40

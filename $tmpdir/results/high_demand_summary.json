@@ -1,6 +1,0 @@
-{
-  "high_demand_quantile": 0.9,
-  "high_demand_threshold": 37.0,
-  "rows_in": 4,
-  "rows_high_demand": 1
-}

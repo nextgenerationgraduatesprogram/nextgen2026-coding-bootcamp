@@ -1,5 +1,0 @@
-hour,day_type,mean_rentals
-8,non_working_day,10.0
-8,working_day,20.0
-9,working_day,30.0
-10,working_day,40.0

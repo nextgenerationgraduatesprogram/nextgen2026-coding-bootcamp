@@ -1,4 +1,4 @@
-# 08 — Refinement and Hardening
+# 07 — Refinement and Hardening
 
 ## What practical question does this guide answer?
 

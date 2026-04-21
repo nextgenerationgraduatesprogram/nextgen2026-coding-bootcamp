@@ -109,8 +109,3 @@ uv run python scripts/run_workflow.py --profile base --run-name baseline-check
 - writing task contracts and loading only the context the agent needs
 - using a plan-first delegation loop and verifying the result in layers
 - keeping git discipline and turning repeated lessons into durable repo improvements
-
-## Documentation Structure
-
-- Operator guide and templates: [`docs/`](./docs)
-- Historical snapshots: [`docs/archive/INDEX.md`](./docs/archive/INDEX.md)
