@@ -25,32 +25,29 @@ When analysis code is embedded in wrappers or notebooks, methodological changes 
 
 These steps intentionally move from directory boundaries to function extraction to wrapper minimization. The sequence makes the rationale visible before introducing additional workflow features.
 
-### Step 1: Use a stable repository layout
+### Step 1: Use a stable repository layout (The "Engine vs. Wrapper" Pattern)
 
 This step defines the physical boundaries that keep method code, execution wrappers, and outputs from mixing. For researchers, clear boundaries reduce accidental coupling that later makes provenance reconstruction difficult. When setting this up, verify each directory has one role and avoid placing analysis logic directly in `scripts/`.
 
-
 ```text
 repo/
-├─ configs/
-├─ data/
-│  ├─ raw/
-│  └─ intermediate/
-├─ notebooks/
-├─ scripts/
-│  ├─ 00_fetch.py
-│  ├─ 01_prepare.py
-│  ├─ 02_analyze.py
-│  └─ 03_report.py
-├─ src/nextgen2026_coding_bootcamp/
-│  ├─ steps/
-│  │  ├─ fetch.py
-│  │  ├─ prepare.py
-│  │  ├─ analyze.py
-│  │  └─ report.py
-│  └─ __init__.py
-├─ tests/
-└─ runs/
+├── configs/               # YAML configuration for each stage (The "Settings")
+│   └── stages/
+├── data/                  # Data storage (ignored by git)
+│   ├── raw/               # Read-only source files
+│   └── intermediate/      # Cleaned/transformed data
+├── scripts/               # THIN wrappers for execution (The "Ignition")
+│   ├── 00_fetch.py
+│   ├── 01_prepare.py
+│   └── 02_analyze.py
+├── src/nextgen2026_coding_bootcamp/
+│   └── steps/             # REUSABLE method logic (The "Engine")
+│       ├── fetch.py
+│       ├── prepare.py
+│       └── analyze.py
+├── notebooks/             # Exploratory analysis and visualization
+├── results/               # Final reports and plots
+└── tests/                 # Quality gates for method logic
 ```
 
 ### Step 2: Keep `analyze` method logic in `src/`
