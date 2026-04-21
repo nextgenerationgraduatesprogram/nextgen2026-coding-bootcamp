@@ -71,8 +71,13 @@ def run_analyze(cfg) -> dict:
     summary_json_path = output_dir / "high_demand_summary.json"
 
     # Save results
+    logger.info(f"analyze:write profile={profile_path}")
     hourly_profile.to_csv(profile_path, index=False)
+
+    logger.info(f"analyze:write demand_share={demand_share_path}")
     high_demand_share_by_hour.to_csv(demand_share_path, index=False)
+
+    logger.info(f"analyze:write weather_summary={weather_summary_path}")
     weather_summary.to_csv(weather_summary_path, index=False)
 
     summary_data = {
@@ -81,9 +86,13 @@ def run_analyze(cfg) -> dict:
         "rows_in": int(len(prepared)),
         "rows_high_demand": int(prepared_with_threshold["is_high_demand"].sum()),
     }
+
+    logger.info(f"analyze:write summary={summary_json_path}")
     summary_json_path.write_text(json.dumps(summary_data, indent=2) + "\n")
 
-    logger.info(f"analyze:finish threshold={high_demand_threshold:.2f}")
+    logger.info(
+        f"analyze:finish rows_in={len(prepared)} threshold={high_demand_threshold:.2f}"
+    )
 
     return {
         "prepared_csv": str(prepared_csv),

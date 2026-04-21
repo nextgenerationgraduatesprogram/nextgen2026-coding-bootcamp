@@ -3,6 +3,7 @@ from pathlib import Path
 
 from nextgen2026_coding_bootcamp.cli import build_stage_parser
 from nextgen2026_coding_bootcamp.config import compose_config
+from nextgen2026_coding_bootcamp.runtime import configure_logging
 from nextgen2026_coding_bootcamp.steps.fetch import run_fetch
 
 
@@ -20,6 +21,12 @@ def main() -> int:
     parts = ["run.yaml", "paths.yaml", stage_part, "profiles/base.yaml"]
 
     cfg = compose_config(config_root=config_root, parts=parts, overrides=args.set)
+
+    # Configure durable logging
+    # Note: using a fixed results dir for now, but in later chapters this will go to a run-specific dir
+    log_path = Path(cfg.paths.results_dir) / "workflow.log"
+    configure_logging(log_path, level=args.log_level)
+
     run_fetch(cfg=cfg)
     return 0
 
