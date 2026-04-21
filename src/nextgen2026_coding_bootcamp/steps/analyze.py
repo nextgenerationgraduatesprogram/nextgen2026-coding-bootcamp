@@ -18,10 +18,14 @@ def build_hourly_profile(df: pd.DataFrame) -> pd.DataFrame:
     )
 
 
-def run_analyze(cfg) -> dict:
+def run_analyze(cfg, ctx=None) -> dict:
     """Run the full analyze stage with a composed configuration."""
     prepared_csv = Path(cfg.paths.intermediate_dir) / "hourly_bike_data.csv"
-    output_dir = Path(cfg.paths.results_dir)
+
+    if ctx is None:
+        output_dir = Path(cfg.paths.results_dir)
+    else:
+        output_dir = ctx.run_dir / "analyze"
     output_dir.mkdir(parents=True, exist_ok=True)
 
     logger.info(f"analyze:start input={prepared_csv}")
