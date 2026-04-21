@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 import json
-from pathlib import Path
 import logging
+from pathlib import Path
 
 import pandas as pd
 
@@ -39,6 +39,7 @@ def run_analyze(cfg, ctx=None, input_csv: Path | None = None) -> dict:
         output_dir = ctx.run_dir / "analyze"
     output_dir.mkdir(parents=True, exist_ok=True)
 
+    logger.info("[analyze]")
     logger.info("analyze:start input=%s", prepared_csv)
 
     prepared = pd.read_csv(prepared_csv)
@@ -90,7 +91,7 @@ def run_analyze(cfg, ctx=None, input_csv: Path | None = None) -> dict:
     summary_path.write_text(json.dumps(summary, indent=2) + "\n")
 
     logger.info(
-        "analyze:finish rows_in=%d rows_out_profile=%d threshold=%s",
+        "analyze:finish rows_in=%d rows_out_profile=%d threshold=%s\n",
         len(prepared),
         len(hourly_profile),
         high_demand_threshold,

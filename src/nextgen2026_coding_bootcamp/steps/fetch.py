@@ -45,6 +45,7 @@ def run_fetch(cfg, ctx=None) -> dict:
     downloaded_archive = False
     extracted_member = False
 
+    logger.info("[fetch]")
     logger.info("fetch:start source_url=%s cache_dir=%s", source_url, raw_dir)
 
     if not cached_archive_path.exists():
@@ -82,7 +83,7 @@ def run_fetch(cfg, ctx=None) -> dict:
         copied_csv_to_run = _copy_if_missing(cached_csv_path, extracted_csv_path)
 
     logger.info(
-        "fetch:finish archive=%s extracted_csv=%s downloaded=%s extracted=%s",
+        "fetch:finish archive=%s extracted_csv=%s downloaded=%s extracted=%s\n",
         archive_path,
         extracted_csv_path,
         downloaded_archive,

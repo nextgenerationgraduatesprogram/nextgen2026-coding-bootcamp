@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 import json
-from pathlib import Path
 import logging
+from pathlib import Path
 
 import pandas as pd
 
@@ -17,7 +17,11 @@ def _resolve_analyze_inputs(cfg, ctx=None) -> tuple[Path, Path, Path]:
             high_demand_share = analyze_artifact.get("high_demand_share_csv")
             summary_json = analyze_artifact.get("summary_json")
             if hourly_profile and high_demand_share and summary_json:
-                return Path(hourly_profile), Path(high_demand_share), Path(summary_json)
+                return (
+                    Path(hourly_profile),
+                    Path(high_demand_share),
+                    Path(summary_json),
+                )
 
     base = Path(cfg.paths.results_dir)
     return (
@@ -28,7 +32,11 @@ def _resolve_analyze_inputs(cfg, ctx=None) -> tuple[Path, Path, Path]:
 
 
 def run_report(cfg, ctx=None) -> dict:
-    hourly_profile_path, high_demand_share_path, summary_path = _resolve_analyze_inputs(
+    (
+        hourly_profile_path,
+        high_demand_share_path,
+        summary_path,
+    ) = _resolve_analyze_inputs(
         cfg=cfg,
         ctx=ctx,
     )
@@ -39,6 +47,7 @@ def run_report(cfg, ctx=None) -> dict:
         output_dir = ctx.run_dir / "report"
     output_dir.mkdir(parents=True, exist_ok=True)
 
+    logger.info("[report]")
     logger.info(
         "report:start hourly_profile=%s high_demand_share=%s",
         hourly_profile_path,
@@ -115,7 +124,7 @@ def run_report(cfg, ctx=None) -> dict:
         summary_md_path.write_text("\n".join(lines) + "\n")
 
     logger.info(
-        "report:finish write_plots=%s write_summary_markdown=%s",
+        "report:finish write_plots=%s write_summary_markdown=%s\n",
         write_plots,
         write_summary_markdown,
     )

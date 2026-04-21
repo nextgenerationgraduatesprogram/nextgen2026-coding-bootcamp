@@ -1,63 +1,129 @@
-# Session Overview
+# 00 — Session Overview
 
-Session 2 frames notebook-to-workflow migration as a research design task: making analytical results traceable from assumptions and data inputs through to reported outputs. The chapter defines the run contract that later chapters implement piece by piece.
+## What practical question does this guide answer?
 
-The purpose is to make reproducibility explicit before any refactoring work begins. By clarifying outcomes, assumptions, and failure modes up front, the rest of the sequence can be taught as a coherent method pathway rather than a disconnected set of coding steps.
+This guide answers the opening question for Session 3: what are students actually doing in this workshop, and what is the collaboration pattern between the human and the coding agent?
 
-## 1. What This Chapter Adds
+The short answer is: choose a bounded task, put it on its own branch, have the agent draft structured artifacts into `agents/docs/`, review those drafts, and only then approve implementation or merge decisions. The longer answer is that the workshop is teaching a supervision habit, not just a prompting habit.
 
-This section defines the session-level success criteria and operating assumptions that all later chapters depend on. Treat these as acceptance criteria for methodological readiness, not optional checklist items.
+## Why this matters
 
-By the end of the core path (`00`-`07`), students should be able to:
+The easiest way for an agent workshop to go off the rails is to collapse into “ask for code, then hope the result looks plausible.” That produces motion, but not necessarily understanding. In research-flavored workflow code, the dangerous failures are often not syntax failures. They are scope failures, interpretation failures, stage-boundary mistakes, and approvals that happen before the human can explain what changed.
 
-1. run the full workflow with explicit configuration;
-2. recover exactly what happened in a run from durable files;
-3. compare runs without guessing parameter or path differences;
-4. use tests as a pre-interpretation quality gate.
+This session tries to prevent that. The prompt-first model is designed to shift the clerical work of drafting specs, briefs, and review notes onto the agent while keeping the important decisions with the human:
 
-## 2. Why This Matters for Researchers
+- which task is worth doing
+- what the task is allowed to touch
+- how the result will be verified
+- when the draft is good enough to approve
+- whether the final result should be accepted, revised, or rejected
 
-Notebook-first exploration remains essential for hypothesis generation, but publication-grade evidence needs explicit controls that survive reruns and team handoffs. This section names the failure modes that motivate every technical decision in the core path.
+## Steps
 
-Common failure modes in notebook-only delivery:
+### Step 1 — Read the operator map and repo guardrails
 
-1. hidden state from out-of-order cell execution;
-2. mutable literals that blur run provenance;
-3. shared output paths that overwrite evidence;
-4. manual reruns that cannot be audited consistently.
-
-These are methodological risks, not formatting issues.
-
-## 3. Build Steps
-
-Complete these steps in order to establish a stable execution baseline before discussing architecture. A valid baseline prevents later chapters from being derailed by environment ambiguity.
-
-### Step 1: Confirm environment tools
+Start by orienting yourself. The workshop makes more sense when students can see the whole flow before they start asking the agent for anything.
 
 ```bash
-uv --version
+sed -n '1,220p' docs/README.md
+sed -n '1,260p' AGENTS.md
 ```
 
-### Step 2: Confirm required Python packages
+You should be able to explain, in plain language, what the repo does and what the main “do not change unless asked” rules are before moving on.
+
+### Step 2 — Check git state and start a bounded branch
+
+Before any delegation, choose a short task slug for the bounded task, inspect the current git state, and decide whether this session is really ready to begin.
 
 ```bash
-uv run python -c "import pandas, omegaconf, matplotlib, pytest; print('env-ok')"
+git status --short --branch
+git switch -c <task-slug>
 ```
 
-### Step 3: Confirm session assumptions
+The important habit is one bounded task per branch. If unrelated work is already present, students should stop and separate that work before they begin drafting specs for a new session.
 
-For this course delivery, students enter with `fetch` and `prepare` already implemented. The core teaching focus is how to make `analyze` and downstream execution reproducible.
+### Step 3 — Run a clean baseline
 
-## 4. Run Checkpoint
-
-Use this checkpoint to verify that the prewritten `fetch` and `prepare` assumptions hold and that `analyze` is runnable on real data. Passing this run confirms the teaching baseline for the rest of the session.
+Before any delegation, confirm that the repository is healthy. Students should see a working baseline before they start proposing changes to it.
 
 ```bash
-uv run python scripts/00_fetch.py --config configs/stages/fetch.yaml
-uv run python scripts/01_prepare.py --config configs/stages/prepare.yaml
-uv run python scripts/02_analyze.py --config configs/stages/analyze.yaml
+uv run pytest -q
+uv run python scripts/run_workflow.py --profile base --run-name baseline
 ```
 
-## 5. Transition
+That baseline matters later. When students review a patch, they need some sense of what already worked and what outputs already existed. In this starting state, the temperature-band feature is intentionally absent. The session adds it later.
 
-Next chapter: [Project Structure](./01-project-structure.md). It introduces boundary decisions that every downstream control relies on, so this transition is a dependency step rather than a topic switch.
+### Step 4 — Inspect the current workflow outputs
+
+Look at the latest run so you can see what each stage already owns.
+
+```bash
+LATEST_RUN=$(ls -1dt runs/* | head -n1)
+find "$LATEST_RUN" -maxdepth 3 -type f | sort
+```
+
+This step is not just housekeeping. It teaches stage ownership. If students can see what `fetch`, `prepare`, `analyze`, and `report` already produce, they are less likely to approve an agent plan that pushes work into the wrong stage.
+
+For this session, students should notice both what exists and what does not. The baseline run should include the normal analyze and report outputs, but not a temperature-band summary artifact yet.
+
+### Step 5 — Inspect the template source and draft workspace
+
+The workshop uses a source-template folder and a separate draft-review folder on purpose.
+
+```bash
+sed -n '1,220p' agents/templates/README.md
+sed -n '1,220p' agents/docs/README.md
+```
+
+Students should understand the distinction:
+
+- `agents/templates/` holds the canonical blank forms
+- `agents/docs/` holds filled drafts generated by the agent for review
+
+That separation is one of the main design changes in this workshop version.
+
+### Step 6 — Ask the agent for the first structured draft
+
+Using the task slug you chose earlier, send a prompt like this:
+
+```text
+Read `AGENTS.md` and `docs/00-session-overview.md` first.
+Convert the task idea below into the format specified in `@01-task-spec.md`.
+Place the result in `agents/docs/<task-slug>-01-task-spec.md` for review.
+Use the current repo structure, stage ownership, and tests to fill risk, scope, and verification.
+Do not implement code.
+
+Task idea:
+Add a temperature-band demand summary in `analyze` and surface it in `report`.
+```
+
+That prompt is proposing a new feature on top of the baseline, not asking the agent to rediscover code that is already present.
+
+If the draft is close but needs work, use a follow-up prompt like this:
+
+```text
+Revise `agents/docs/<task-slug>-01-task-spec.md` using the review comments below.
+Keep the same template structure.
+Keep the scope bounded.
+Do not implement code.
+```
+
+The point here is not that this exact task is magical. The point is that students start the session by seeing the agent produce a reviewable structured draft instead of immediately producing code.
+
+## Outputs
+
+- The session work is isolated on a branch dedicated to the bounded task.
+- `agents/docs/<task-slug>-01-task-spec.md` exists as a first draft created by the agent.
+- That draft has been reviewed once for bounded scope, repo grounding, and the absence of implementation work.
+
+## Discussion
+
+1. Why is it useful to have the agent draft the structured artifact instead of asking students to fill it in manually?
+2. What would go wrong if the first prompt asked for code instead of for a task spec draft?
+3. Which parts of the session should remain firmly human-owned even if the agent drafts the paperwork?
+4. What would count as evidence that a student understands the workflow rather than just following the steps mechanically?
+5. Where in the session is the review gate most likely to be skipped, and why?
+
+## Next
+
+Continue to [01 — Risk, Task Types, and Review Burden](./01-agent-tasks.md).

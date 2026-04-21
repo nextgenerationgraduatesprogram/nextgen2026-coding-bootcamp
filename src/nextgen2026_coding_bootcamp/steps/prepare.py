@@ -58,6 +58,7 @@ def run_prepare(cfg, ctx=None, input_csv: Path | None = None) -> dict:
         stage_output_dir = ctx.run_dir / "prepare"
     stage_output_dir.mkdir(parents=True, exist_ok=True)
 
+    logger.info("[prepare]")
     logger.info("prepare:start input=%s", source_csv)
 
     raw = pd.read_csv(source_csv, parse_dates=["dteday"])
@@ -109,7 +110,7 @@ def run_prepare(cfg, ctx=None, input_csv: Path | None = None) -> dict:
         output_path = None
 
     logger.info(
-        "prepare:finish rows_in=%d rows_out=%d keep_holidays=%s wrote_csv=%s",
+        "prepare:finish rows_in=%d rows_out=%d keep_holidays=%s wrote_csv=%s\n",
         len(raw),
         len(prepared),
         keep_holidays,
