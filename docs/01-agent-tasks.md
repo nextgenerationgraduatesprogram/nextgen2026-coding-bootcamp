@@ -2,9 +2,9 @@
 
 ## What practical question does this guide answer?
 
-This guide answers the first operator decision: is this a good task to hand to the agent, and how much review should the human expect to do?
+This guide answers the first operator decision: is this a good task to hand to the agent, and how much review should you expect to do?
 
-In the new workflow, the human does not fill out a separate risk card by hand. The agent drafts that reasoning inside `@01-task-spec.md`, and the human reviews whether it is sensible, grounded in the repo, and appropriate for the session.
+In the new workflow, you do not fill out a separate risk card by hand. The agent drafts that reasoning inside `@01-task-spec.md`, and you review whether it is sensible, grounded in the repo, and appropriate for the session.
 
 ## Why this matters
 

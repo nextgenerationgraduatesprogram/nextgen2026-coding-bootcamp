@@ -4,13 +4,13 @@
 
 This guide answers the context question: what does the agent actually need to see to do the task well without getting flooded with irrelevant files?
 
-In the prompt-first workflow, the answer should be drafted into `@02-agent-brief.md`, then reviewed by the human before implementation begins.
+In the prompt-first workflow, the answer should be drafted into `@02-agent-brief.md`, then reviewed by you before implementation begins.
 
 ## Why this matters
 
 Giving the agent the whole repo is not the same as giving it the right context. Good supervision means choosing a minimal, defensible context bundle and explaining why each item is there.
 
-This is where students learn a useful habit: context should be justified, not merely attached. If the human cannot explain why a file is in the context bundle, there is a good chance the agent does not need it yet.
+This is where you build a useful habit: context should be justified, not merely attached. If you cannot explain why a file is in the context bundle, there is a good chance the agent does not need it yet.
 
 ## Steps
 
@@ -48,7 +48,7 @@ Do not implement code.
 
 ### Step 3 — Review the bundle for both sufficiency and restraint
 
-A good context bundle is not just short. It is explainable. Students should be able to say:
+A good context bundle is not just short. It is explainable. You should be able to say:
 
 - why each file is included
 - what uncertainty it resolves

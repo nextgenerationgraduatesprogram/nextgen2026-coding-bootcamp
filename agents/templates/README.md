@@ -1,9 +1,9 @@
 # Session 3 Templates
 
-These are the canonical blank templates for the prompt-first workshop flow. Keep these files as source templates. Ask the agent to draft filled versions into `agents/docs/` for human review.
+These are the canonical blank templates for the prompt-first workshop flow. Keep these files as source templates. Ask the agent to draft filled versions into `agents/docs/` so you can review them.
 
 1. `01-task-spec.md`
-   Use when the human has chosen a task and wants the agent to draft the approved task spec, including risk, scope, and verification.
+   Use when you have chosen a task and want the agent to draft the approved task spec, including risk, scope, and verification.
 2. `02-agent-brief.md`
    Use after the task spec is approved to draft the bounded implementation handoff, minimal context bundle, and required return format.
 3. `03-review-and-decision.md`

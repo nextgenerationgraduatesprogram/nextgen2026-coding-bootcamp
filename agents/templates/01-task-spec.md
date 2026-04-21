@@ -28,13 +28,13 @@
 
 ## Verification Plan
 
-| Layer | Planned check | Repo surface or command | What it proves | What still needs human review |
+| Layer | Planned check | Repo surface or command | What it proves | What still needs your review |
 | --- | --- | --- | --- | --- |
 | Unit |  |  |  |  |
 | Integration |  |  |  |  |
 | End-to-end or smoke |  |  |  |  |
 | Artifact or contract |  |  |  |  |
-| Human review |  |  |  |  |
+| Your review |  |  |  |  |
 
 ## Decision Threshold
 
@@ -44,5 +44,5 @@
 
 ## Approval
 
-- Human reviewer:
+- Reviewer:
 - Status: Draft / Approved / Revise

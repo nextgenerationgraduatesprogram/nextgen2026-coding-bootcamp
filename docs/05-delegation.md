@@ -2,15 +2,15 @@
 
 ## What practical question does this guide answer?
 
-This guide answers the handoff question: what prompt should the human actually send to the agent to begin implementation without losing control of the task?
+This guide answers the handoff question: what prompt should you actually send to the agent to begin implementation without losing control of the task?
 
-The answer should already be drafted inside `agents/docs/<task-slug>-02-agent-brief.md`. The human reviews that brief, approves it, and then uses the `First Handoff Message` section as the implementation kickoff.
+The answer should already be drafted inside `agents/docs/<task-slug>-02-agent-brief.md`. You review that brief, approve it, and then use the `First Handoff Message` section as the implementation kickoff.
 
 ## Why this matters
 
-The cheapest place to catch scope drift is before implementation starts. A good first handoff asks for understanding, file inspection, and a short plan before any code is written. That is especially important in a workshop, where students can mistake quick code generation for successful supervision.
+The cheapest place to catch scope drift is before implementation starts. A good first handoff asks for understanding, file inspection, and a short plan before any code is written. That is especially important in a workshop, where it is easy to mistake quick code generation for successful supervision.
 
-This stage is also where students learn a subtle but important lesson: the first implementation prompt should itself be a reviewed artifact, not an improvised message typed in the moment.
+This stage is also where you learn a subtle but important lesson: the first implementation prompt should itself be a reviewed artifact, not an improvised message typed in the moment.
 
 ## Steps
 
@@ -23,7 +23,7 @@ Keep the scope bounded.
 Do not implement code.
 ```
 
-If the brief needs another pass after human review, use:
+If the brief needs another pass after review, use:
 
 ```text
 Revise `agents/docs/<task-slug>-02-agent-brief.md` using the review comments below.
@@ -38,14 +38,14 @@ After approval, send the `First Handoff Message` section back to the coding agen
 
 ### Step 3 — Review the return against the brief
 
-When the agent responds, the human should compare that response to the approved brief:
+When the agent responds, compare that response to the approved brief:
 
 - did the agent restate the task correctly?
 - did it identify the right files?
 - did it keep the stage boundary intact?
 - did it propose a believable verification path?
 
-If the answer is no, students should revise the brief or the plan before any implementation continues.
+If the answer is no, revise the brief or the plan before any implementation continues.
 
 ### Step 4 — Keep the implementation branch reviewable
 
@@ -72,7 +72,7 @@ The teaching point is not “commit after every keystroke.” It is to prefer sm
 1. Why is plan review cheaper and safer than trying to fix drift after the diff already exists?
 2. What kind of plan response would make you stop immediately and ask for revision?
 3. What does a good implementation handoff reveal about whether the agent actually understood the task?
-4. What should the human do if the agent returns a plausible plan that still widens scope?
+4. What should you do if the agent returns a plausible plan that still widens scope?
 5. How do stop-and-escalate conditions change the tone and safety of an implementation handoff?
 
 ## Next

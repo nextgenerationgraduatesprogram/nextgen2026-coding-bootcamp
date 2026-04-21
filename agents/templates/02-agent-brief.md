@@ -46,5 +46,5 @@
 
 ## Approval
 
-- Human reviewer:
+- Reviewer:
 - Status: Draft / Approved / Revise

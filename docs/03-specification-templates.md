@@ -4,13 +4,13 @@
 
 This guide answers the approval question: when is the task spec good enough to become the contract for implementation?
 
-Students should not be rewriting the task spec from scratch themselves. They should review the agent’s draft, decide what is pinned versus flexible, and then ask the agent to revise the draft until it is decision-ready.
+You should not be rewriting the task spec from scratch yourself. Review the agent’s draft, decide what is pinned versus flexible, and then ask the agent to revise the draft until it is decision-ready.
 
 ## Why this matters
 
-The most expensive mistakes in agent work often come from hidden decisions: wrong stage, widened scope, renamed artifacts, or a vague idea of what “done” means. The approved task spec is where the human locks those decisions down.
+The most expensive mistakes in agent work often come from hidden decisions: wrong stage, widened scope, renamed artifacts, or a vague idea of what “done” means. The approved task spec is where you lock those decisions down.
 
-This is the point where the workshop most clearly shifts from “agent as generator” to “agent as drafting assistant.” The human is not just checking grammar. The human is deciding what the agent is not allowed to improvise.
+This is the point where the workshop most clearly shifts from “agent as generator” to “agent as drafting assistant.” You are not just checking grammar. You are deciding what the agent is not allowed to improvise.
 
 ## Steps
 
@@ -50,7 +50,7 @@ Do not implement code.
 
 ### Step 3 — Approve the spec deliberately
 
-The approval moment should feel explicit, not implied. Students should be able to say:
+The approval moment should feel explicit, not implied. You should be able to say:
 
 - this is the task
 - this is what must not change

@@ -2,15 +2,15 @@
 
 ## What practical question does this guide answer?
 
-This guide answers the post-implementation question: how should the human turn tests, diffs, artifact inspection, and current git state into an explicit decision?
+This guide answers the post-implementation question: how should you turn tests, diffs, artifact inspection, and current git state into an explicit decision?
 
-In the new workflow, the human asks the agent to draft that reasoning into `@03-review-and-decision.md`, then reviews the recommendation before deciding whether to fix, commit, merge, revert, or stop.
+In the new workflow, you ask the agent to draft that reasoning into `@03-review-and-decision.md`, then review the recommendation before deciding whether to fix, commit, merge, revert, or stop.
 
 ## Why this matters
 
-Passing tests alone is not enough. The human still has to judge whether the change respected the approved scope, used the right stage boundary, and represented the artifact honestly.
+Passing tests alone is not enough. You still have to judge whether the change respected the approved scope, used the right stage boundary, and represented the artifact honestly.
 
-This is a useful teaching moment because it shows students that “have the agent summarize the evidence” is not the same thing as “let the agent decide unilaterally.” The review draft is assistance for judgment, not a replacement for it.
+This is a useful teaching moment because it shows you that “have the agent summarize the evidence” is not the same thing as “let the agent decide unilaterally.” The review draft supports your judgment; it does not replace it.
 
 ## Steps
 
@@ -27,7 +27,7 @@ git diff
 find "$LATEST_RUN" -maxdepth 2 -type f | sort
 ```
 
-The important thing here is to gather both mechanical and human-readable evidence. For the running example, that means you want the tests, the branch state, the diff, the generated CSV, and the report markdown.
+The important thing here is to gather both mechanical and readable evidence. For the running example, that means you want the tests, the branch state, the diff, the generated CSV, and the report markdown.
 
 ### Step 2 — Ask the agent to draft the review and decision record
 
@@ -38,7 +38,7 @@ Make an explicit `Accept / Revise / Reject` recommendation with reasons.
 Do not make git changes.
 ```
 
-If the first draft needs revision after human review, use:
+If the first draft needs revision after review, use:
 
 ```text
 Revise `agents/docs/<task-slug>-03-review-and-decision.md` using the review comments below.
@@ -49,14 +49,14 @@ Do not make git changes.
 
 ### Step 3 — Review the recommendation, not just the format
 
-The draft should help the human answer questions like:
+The draft should help you answer questions like:
 
 - did the change actually stay inside the approved task spec?
 - do the tests and artifacts line up?
 - does the report say only what the artifact supports?
 - if the result is weak, should the branch get one more corrective commit or should this work stop here?
 
-Students should not assume that a neatly written review draft is automatically correct. It still has to be checked against the actual evidence.
+Do not assume that a neatly written review draft is automatically correct. It still has to be checked against the actual evidence.
 
 ### Step 4 — Use the approved review record to decide the git action
 
@@ -68,7 +68,7 @@ Use the `Next Git Action` section to make the branch decision explicit:
 - `Revise` means fix the problem on the branch before anything is merged.
 - `Reject` means stop, revert, or discard the branch rather than hiding the mistake inside more unrelated edits.
 
-This is where students should clean up mistakes while the work is still isolated. The workshop is trying to build the habit that merge decisions follow approved review evidence instead of arriving as a separate, loosely connected step.
+This is where you should clean up mistakes while the work is still isolated. The workshop is trying to build the habit that merge decisions follow approved review evidence instead of arriving as a separate, loosely connected step.
 
 ## Outputs
 
@@ -79,7 +79,7 @@ This is where students should clean up mistakes while the work is still isolated
 ## Discussion
 
 1. What would make you choose `Revise` instead of `Accept` even if the tests passed?
-2. Which parts of the temperature-band task are still fundamentally human-reviewed, not fully automated?
+2. Which parts of the temperature-band task still depend on your review instead of automation?
 3. What kind of diff change would tell you the agent had solved the wrong problem?
 4. What evidence would make you question the report narrative even if the artifact file looks correct?
 5. When is rejection the right teaching move instead of one more revision loop?

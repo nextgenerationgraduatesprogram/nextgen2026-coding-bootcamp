@@ -2,21 +2,21 @@
 
 ## What practical question does this guide answer?
 
-This guide answers the final workshop question: what should become part of the repository’s durable workflow after one bounded agent cycle is complete?
+This guide answers the final workshop question: what should become part of the repository’s durable workflow after you complete one bounded agent cycle?
 
-Students should ask the agent to draft that answer into `@04-hardening-note.md`, then review what really deserves to become repo structure.
+You should ask the agent to draft that answer into `@04-hardening-note.md`, then review what really deserves to become repo structure.
 
 ## Why this matters
 
-If every lesson stays trapped in one session, the team pays the same coordination cost again next time. The goal here is to turn repeated friction into better instructions, tests, prompts, or templates.
+If every lesson stays trapped in one session, we pay the same coordination cost again next time. The goal here is to turn repeated friction into better instructions, tests, prompts, or templates.
 
-This closing step is what keeps the workshop from being only a one-off exercise. It asks students to convert experience into durable process: what should become part of `AGENTS.md`, what should become a test, what prompt pattern was genuinely reusable, and what was only useful for this one task.
+This closing step is what keeps the workshop from being only a one-off exercise. It asks you to convert experience into durable process: what should become part of `AGENTS.md`, what should become a test, what prompt pattern was genuinely reusable, and what was only useful for this one task.
 
 ## Steps
 
 ### Step 1 — Close the task branch deliberately
 
-Before turning the session into durable process, students should be able to say what happened to the task branch: merged, parked for more revision, or discarded after rejection.
+Before turning the session into durable process, you should be able to say what happened to the task branch: merged, parked for more revision, or discarded after rejection.
 
 That matters because hardening should reflect the real outcome. A merged task and a rejected task teach different lessons.
 
@@ -40,7 +40,7 @@ Do not change repo files yet.
 
 ### Step 3 — Distinguish durable lessons from one-off notes
 
-Not every annoyance deserves to become repo process. When students review the hardening note, they should ask:
+Not every annoyance deserves to become repo process. When you review the hardening note, ask:
 
 - is this a repeated problem or just a one-off issue?
 - would a stronger instruction help next time?

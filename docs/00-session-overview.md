@@ -2,15 +2,15 @@
 
 ## What practical question does this guide answer?
 
-This guide answers the opening question for Session 3: what are students actually doing in this workshop, and what is the collaboration pattern between the human and the coding agent?
+This guide answers the opening question for Session 3: what are you actually doing in this workshop, and what is the collaboration pattern between you and the coding agent?
 
 The short answer is: choose a bounded task, put it on its own branch, have the agent draft structured artifacts into `agents/docs/`, review those drafts, and only then approve implementation or merge decisions. The longer answer is that the workshop is teaching a supervision habit, not just a prompting habit.
 
 ## Why this matters
 
-The easiest way for an agent workshop to go off the rails is to collapse into “ask for code, then hope the result looks plausible.” That produces motion, but not necessarily understanding. In research-flavored workflow code, the dangerous failures are often not syntax failures. They are scope failures, interpretation failures, stage-boundary mistakes, and approvals that happen before the human can explain what changed.
+The easiest way for an agent workshop to go off the rails is to collapse into “ask for code, then hope the result looks plausible.” That produces motion, but not necessarily understanding. In research-flavored workflow code, the dangerous failures are often not syntax failures. They are scope failures, interpretation failures, stage-boundary mistakes, and approvals that happen before you can explain what changed.
 
-This session tries to prevent that. The prompt-first model is designed to shift the clerical work of drafting specs, briefs, and review notes onto the agent while keeping the important decisions with the human:
+This session tries to prevent that. The prompt-first model is designed to shift the clerical work of drafting specs, briefs, and review notes onto the agent while keeping the important decisions with you:
 
 - which task is worth doing
 - what the task is allowed to touch
@@ -22,7 +22,7 @@ This session tries to prevent that. The prompt-first model is designed to shift 
 
 ### Step 1 — Read the operator map and repo guardrails
 
-Start by orienting yourself. The workshop makes more sense when students can see the whole flow before they start asking the agent for anything.
+Start by orienting yourself. The workshop makes more sense when you can see the whole flow before you start asking the agent for anything.
 
 ```bash
 sed -n '1,220p' docs/README.md
@@ -40,18 +40,18 @@ git status --short --branch
 git switch -c <task-slug>
 ```
 
-The important habit is one bounded task per branch. If unrelated work is already present, students should stop and separate that work before they begin drafting specs for a new session.
+The important habit is one bounded task per branch. If unrelated work is already present, stop and separate that work before you begin drafting specs for a new session.
 
 ### Step 3 — Run a clean baseline
 
-Before any delegation, confirm that the repository is healthy. Students should see a working baseline before they start proposing changes to it.
+Before any delegation, confirm that the repository is healthy. You should see a working baseline before you start proposing changes to it.
 
 ```bash
 uv run pytest -q
 uv run python scripts/run_workflow.py --profile base --run-name baseline
 ```
 
-That baseline matters later. When students review a patch, they need some sense of what already worked and what outputs already existed. In this starting state, the temperature-band feature is intentionally absent. The session adds it later.
+That baseline matters later. When you review a patch, you need some sense of what already worked and what outputs already existed. In this starting state, the temperature-band feature is intentionally absent. The session adds it later.
 
 ### Step 4 — Inspect the current workflow outputs
 
@@ -62,9 +62,9 @@ LATEST_RUN=$(ls -1dt runs/* | head -n1)
 find "$LATEST_RUN" -maxdepth 3 -type f | sort
 ```
 
-This step is not just housekeeping. It teaches stage ownership. If students can see what `fetch`, `prepare`, `analyze`, and `report` already produce, they are less likely to approve an agent plan that pushes work into the wrong stage.
+This step is not just housekeeping. It teaches stage ownership. If you can see what `fetch`, `prepare`, `analyze`, and `report` already produce, you are less likely to approve an agent plan that pushes work into the wrong stage.
 
-For this session, students should notice both what exists and what does not. The baseline run should include the normal analyze and report outputs, but not a temperature-band summary artifact yet.
+For this session, you should notice both what exists and what does not. The baseline run should include the normal analyze and report outputs, but not a temperature-band summary artifact yet.
 
 ### Step 5 — Inspect the template source and draft workspace
 
@@ -75,7 +75,7 @@ sed -n '1,220p' agents/templates/README.md
 sed -n '1,220p' agents/docs/README.md
 ```
 
-Students should understand the distinction:
+You should understand the distinction:
 
 - `agents/templates/` holds the canonical blank forms
 - `agents/docs/` holds filled drafts generated by the agent for review
@@ -108,7 +108,7 @@ Keep the scope bounded.
 Do not implement code.
 ```
 
-The point here is not that this exact task is magical. The point is that students start the session by seeing the agent produce a reviewable structured draft instead of immediately producing code.
+The point here is not that this exact task is magical. The point is that you start the session by seeing the agent produce a reviewable structured draft instead of immediately producing code.
 
 ## Outputs
 
@@ -118,10 +118,10 @@ The point here is not that this exact task is magical. The point is that student
 
 ## Discussion
 
-1. Why is it useful to have the agent draft the structured artifact instead of asking students to fill it in manually?
+1. Why is it useful to have the agent draft the structured artifact instead of having you fill it in manually?
 2. What would go wrong if the first prompt asked for code instead of for a task spec draft?
-3. Which parts of the session should remain firmly human-owned even if the agent drafts the paperwork?
-4. What would count as evidence that a student understands the workflow rather than just following the steps mechanically?
+3. Which parts of the session should remain firmly in your hands even if the agent drafts the paperwork?
+4. What would count as evidence that you understand the workflow rather than just following the steps mechanically?
 5. Where in the session is the review gate most likely to be skipped, and why?
 
 ## Next

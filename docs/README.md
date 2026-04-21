@@ -2,25 +2,25 @@
 
 This guide is the operator map for Session 3. It assumes one working repository, one bounded workflow change, and one reviewable path from idea to decision. The repository is built around the Bike Sharing workflow, `fetch -> prepare -> analyze -> report`, and the running example across the core path is to add a temperature-band demand summary in `analyze` and surface it in `report`.
 
-The starting repository intentionally does not include that feature. Students are meant to define, implement, verify, and review the temperature-band change over the course of the session rather than inspect a pre-solved baseline.
+The starting repository intentionally does not include that feature. You are meant to define, implement, verify, and review the temperature-band change over the course of the session rather than inspect a pre-solved baseline.
 
-The teaching emphasis in this version is prompt-first rather than template-first. Students should spend less time hand-authoring structured artifacts themselves and more time learning how to ask the coding agent to draft those artifacts in a reviewable way. The human still owns task choice, approval, interpretation, and merge decisions. What changes is where the clerical and formatting work happens.
+The teaching emphasis in this version is prompt-first rather than template-first. You should spend less time hand-authoring structured artifacts yourself and more time learning how to ask the coding agent to draft those artifacts in a reviewable way. You still own task choice, approval, interpretation, and merge decisions. What changes is where the clerical and formatting work happens.
 
-That distinction matters. The workshop is not trying to teach “prompt until code appears.” It is trying to teach how to direct an agent inside a real repository without giving up control of scope, scientific meaning, or review quality. The structured drafts in `agents/docs/` are there to make that supervision legible.
+That distinction matters. The workshop is not trying to teach “prompt until code appears.” It is trying to teach you how to direct an agent inside a real repository without giving up control of scope, scientific meaning, or review quality. The structured drafts in `agents/docs/` are there to make that supervision legible.
 
-Git discipline is part of that supervision loop, not a separate stage. Students should usually begin by checking git state and creating a task branch, keep work reviewable with small commits during implementation, clean up mistakes while the work is still isolated on that branch, and only merge after the review record is approved.
+Git discipline is part of that supervision loop, not a separate stage. You should usually begin by checking git state and creating a task branch, keep work reviewable with small commits during implementation, clean up mistakes while the work is still isolated on that branch, and only merge after the review record is approved.
 
 ## Session Pattern
 
 The default loop for the session is:
 
-1. Human chooses a bounded task and a task slug.
-2. Human asks the agent to convert that task into a structured draft using a named template.
-3. Agent writes the draft into `agents/docs/`.
-4. Human reviews, edits, approves, or requests revision.
-5. Agent uses the approved draft as the contract for the next step.
+1. You choose a bounded task and a task slug.
+2. You ask the agent to convert that task into a structured draft using a named template.
+3. The agent writes the draft into `agents/docs/`.
+4. You review, edit, approve, or request revision.
+5. The agent uses the approved draft as the contract for the next step.
 
-The important point is that templates remain canonical blanks in `agents/templates/`. The working session artifacts live in `agents/docs/`. That keeps the source templates reusable and gives the human a clean place to review what the agent actually produced.
+The important point is that templates remain canonical blanks in `agents/templates/`. The working session artifacts live in `agents/docs/`. That keeps the source templates reusable and gives you a clean place to review what the agent actually produced.
 
 ## Core Flow
 
@@ -52,21 +52,20 @@ The only active template interfaces for the session are:
 - `@03-review-and-decision.md`
 - `@04-hardening-note.md`
 
-Those templates are intentionally few. They are meant to cover the actual decision points in the workshop, not to create paperwork for its own sake. If a structured artifact is not helping the human supervise the agent, it should not be part of the active path.
-
+Those templates are intentionally few. They are meant to cover the actual decision points in the workshop, not to create paperwork for its own sake. If a structured artifact is not helping you supervise the agent, it should not be part of the active path.
 Canonical blanks live in [agents/templates/README.md](../agents/templates/README.md). Session-specific drafts live in [agents/docs/README.md](../agents/docs/README.md).
 
 ## How To Read These Docs
 
 Each core guide is written to do five jobs:
 
-- explain what question the human is trying to answer at that stage
+- explain what question you are trying to answer at that stage
 - explain why that question matters in a real codebase
-- give a copy-paste prompt the human can send to the agent
+- give a copy-paste prompt you can send to the agent
 - name the concrete outputs that should exist and be reviewed by the end of the step
 - offer discussion prompts that help the instructor turn the exercise into a conversation
 
-That combination is deliberate. A workshop reader should never be left with only abstract advice, but also should not be left with only prompt snippets and no understanding of why those snippets are shaped the way they are.
+That combination is deliberate. You should never be left with only abstract advice, but you also should not be left with only prompt snippets and no understanding of why those snippets are shaped the way they are.
 
 ## Archive
 

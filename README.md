@@ -1,6 +1,6 @@
 # Session 3 - Controlled Agent Collaboration for Workflow Extensions
 
-This repository teaches controlled use of AI coding agents inside the Bike Sharing workflow. The goal is not to make the agent the center of the session. The goal is to show how bounded delegation fits into a reviewable workflow that still belongs to the humans operating the repository.
+This repository shows you how to use AI coding agents inside the Bike Sharing workflow without giving up control of the work. We keep the agent inside a bounded, reviewable workflow instead of making it the center of the session.
 
 Core operating rule:
 

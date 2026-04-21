@@ -2,9 +2,9 @@
 
 ## What practical question does this guide answer?
 
-This guide answers the next operator question: how will the human know whether the delegated change is good enough to keep?
+This guide answers the next operator question: how will you know whether the delegated change is good enough to keep?
 
-The answer should live inside the same task spec draft. Students should ask the agent to strengthen the verification plan inside `agents/docs/<task-slug>-01-task-spec.md` instead of filling a separate testing matrix by hand.
+The answer should live inside the same task spec draft. You should ask the agent to strengthen the verification plan inside `agents/docs/<task-slug>-01-task-spec.md` instead of filling a separate testing matrix by hand.
 
 ## Why this matters
 
@@ -16,7 +16,7 @@ This repository is especially good for teaching that point because it already ha
 - handoff and integration checks
 - end-to-end workflow execution
 - direct inspection of generated artifacts
-- human reading of report output
+- your reading of report output
 
 No single one of those is enough on its own.
 
@@ -31,9 +31,9 @@ sed -n '1,220p' tests/test_integration_stage_handoff.py
 sed -n '1,220p' tests/test_workflow_smoke.py
 ```
 
-The goal here is not just to collect filenames. It is to notice what the repo can already tell you mechanically, and what still has to stay human-reviewed.
+The goal here is not just to collect filenames. It is to notice what the repo can already tell you mechanically, and what still has to stay under your review.
 
-In the baseline repository, `tests/test_analyze_report.py` is intentionally only a neutral analyze/report check. Students are expected to extend that coverage during the session rather than inherit a solved specification from the starting test file.
+In the baseline repository, `tests/test_analyze_report.py` is intentionally only a neutral analyze/report check. You are expected to extend that coverage during the session rather than inherit a solved specification from the starting test file.
 
 ### Step 2 — Ask the agent to revise the verification plan inside the task spec
 
@@ -50,7 +50,7 @@ If the first draft is too weak, use a follow-up prompt like this:
 ```text
 Revise `agents/docs/<task-slug>-01-task-spec.md` using the review comments below.
 Make the verification plan more concrete.
-Separate what tests can prove from what still needs human review.
+Separate what tests can prove from what still needs your review.
 Do not implement code.
 ```
 
@@ -62,20 +62,20 @@ When you read the revised draft, you want to see more than “run pytest.” A g
 - what handoff to check between stages
 - whether the whole workflow still runs
 - what artifact to inspect directly
-- what wording or interpretation still requires a human reader
+- what wording or interpretation still requires your judgment
 
 For the temperature-band example, that means the plan should eventually cover a new `temperature_band_summary.csv` artifact and the report markdown, not just the baseline tests.
 
 ## Outputs
 
 - `agents/docs/<task-slug>-01-task-spec.md` has been revised to include a concrete verification plan and clearer decision thresholds.
-- That draft has been reviewed to confirm it covers tests, workflow evidence, artifact inspection, and human judgment where needed.
+- That draft has been reviewed to confirm it covers tests, workflow evidence, artifact inspection, and your judgment where needed.
 
 ## Discussion
 
 1. Which test layer would catch a broken analyze-to-report handoff fastest in this repository?
 2. What could still be wrong with the change even if the full test suite passed?
-3. Which task types in this repo create the biggest gap between automated evidence and human judgment?
+3. Which task types in this repo create the biggest gap between automated evidence and your judgment?
 4. What evidence should come from generated artifacts rather than from `pytest` output?
 5. How would your verification plan change if the task touched `prepare` instead of only `analyze` and `report`?
 
