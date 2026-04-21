@@ -1,107 +1,94 @@
 from __future__ import annotations
 
-import pandas as pd
 import json
+import logging
 from pathlib import Path
 
+import pandas as pd
 
-def build_hourly_profile(input_csv: Path, output_csv: Path) -> dict:
+logger = logging.getLogger(__name__)
+
+
+def build_hourly_profile(df: pd.DataFrame) -> pd.DataFrame:
     """Build a profile of mean rentals by hour and day type."""
-    df = pd.read_csv(input_csv)
-
-    profile = (
+    return (
         df.groupby(["hour", "day_type"], as_index=False)["total_rentals"]
         .mean()
         .rename(columns={"total_rentals": "mean_rentals"})
     )
 
-    output_csv.parent.mkdir(parents=True, exist_ok=True)
-    profile.to_csv(output_csv, index=False)
-
-    return {
-        "rows_in": int(len(df)),
-        "rows_out": int(len(profile)),
-        "output_csv": str(output_csv),
-    }
-
-
-def build_high_demand_share(
-    input_csv: Path, output_csv: Path, quantile: float = 0.90
-) -> dict:
-    """Calculate the share of high-demand observations by hour."""
-    df = pd.read_csv(input_csv)
-
-    cutoff = df["total_rentals"].quantile(quantile)
-    df["is_high_demand"] = df["total_rentals"] >= cutoff
-
-    share = (
-        df.groupby("hour", as_index=False)["is_high_demand"]
-        .mean()
-        .rename(columns={"is_high_demand": "high_demand_share"})
-    )
-
-    output_csv.parent.mkdir(parents=True, exist_ok=True)
-    share.to_csv(output_csv, index=False)
-
-    return {
-        "cutoff": float(cutoff),
-        "output_csv": str(output_csv),
-    }
-
-
-def build_weather_summary(input_csv: Path, output_csv: Path) -> dict:
-    """Summarize rentals by weather conditions."""
-    df = pd.read_csv(input_csv)
-
-    summary = (
-        df.groupby("weather", as_index=False)
-        .agg(
-            mean_rentals=("total_rentals", "mean"),
-            observations=("total_rentals", "size"),
-        )
-        .sort_values("mean_rentals", ascending=False)
-    )
-
-    output_csv.parent.mkdir(parents=True, exist_ok=True)
-    summary.to_csv(output_csv, index=False)
-
-    return {
-        "output_csv": str(output_csv),
-    }
-
 
 def run_analyze(cfg) -> dict:
-    """Run the analyze stage with a composed configuration."""
+    """Run the full analyze stage with a composed configuration."""
     prepared_csv = Path(cfg.paths.intermediate_dir) / "hourly_bike_data.csv"
     output_dir = Path(cfg.paths.results_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    # Use the helper functions but wire them to the config
-    profile_path = output_dir / "hourly_profile.csv"
-    demand_path = output_dir / "high_demand_share_by_hour.csv"
-    weather_path = output_dir / "weather_summary.csv"
-    summary_path = output_dir / "high_demand_summary.json"
+    logger.info(f"analyze:start input={prepared_csv}")
 
-    profile_metrics = build_hourly_profile(prepared_csv, profile_path)
-    demand_metrics = build_high_demand_share(
-        prepared_csv, demand_path, quantile=cfg.analysis.high_demand_quantile
+    prepared = pd.read_csv(prepared_csv)
+
+    # Calculate high demand threshold and share
+    high_demand_quantile = float(cfg.analysis.high_demand_quantile)
+    high_demand_threshold = float(
+        prepared["total_rentals"].quantile(high_demand_quantile)
     )
-    build_weather_summary(prepared_csv, weather_path)
 
-    summary_path.write_text(
-        json.dumps(
-            {
-                "high_demand_quantile": float(cfg.analysis.high_demand_quantile),
-                "high_demand_threshold": demand_metrics["cutoff"],
-                "rows_in": profile_metrics["rows_in"],
-            },
-            indent=2,
+    prepared_with_threshold = prepared.assign(
+        is_high_demand=lambda x: x["total_rentals"] >= high_demand_threshold,
+    )
+
+    # 1. Hourly Profile
+    hourly_profile = build_hourly_profile(prepared)
+
+    # 2. High Demand Share
+    high_demand_share_by_hour = (
+        prepared_with_threshold.groupby("hour", as_index=False)["is_high_demand"]
+        .mean()
+        .rename(columns={"is_high_demand": "high_demand_share"})
+    )
+
+    # 3. Weather Summary
+    if "weather" in prepared.columns:
+        weather_summary = (
+            prepared.groupby("weather", as_index=False)
+            .agg(
+                mean_rentals=("total_rentals", "mean"),
+                observations=("total_rentals", "size"),
+            )
+            .sort_values("mean_rentals", ascending=False)
         )
-        + "\n"
-    )
+    else:
+        logger.warning("analyze:weather_column_missing skipping aggregation")
+        weather_summary = pd.DataFrame(
+            columns=["weather", "mean_rentals", "observations"]
+        )
+
+    # Define output paths
+    profile_path = output_dir / "hourly_profile.csv"
+    demand_share_path = output_dir / "high_demand_share_by_hour.csv"
+    weather_summary_path = output_dir / "weather_summary.csv"
+    summary_json_path = output_dir / "high_demand_summary.json"
+
+    # Save results
+    hourly_profile.to_csv(profile_path, index=False)
+    high_demand_share_by_hour.to_csv(demand_share_path, index=False)
+    weather_summary.to_csv(weather_summary_path, index=False)
+
+    summary_data = {
+        "high_demand_quantile": high_demand_quantile,
+        "high_demand_threshold": high_demand_threshold,
+        "rows_in": int(len(prepared)),
+        "rows_high_demand": int(prepared_with_threshold["is_high_demand"].sum()),
+    }
+    summary_json_path.write_text(json.dumps(summary_data, indent=2) + "\n")
+
+    logger.info(f"analyze:finish threshold={high_demand_threshold:.2f}")
 
     return {
         "prepared_csv": str(prepared_csv),
         "hourly_profile_csv": str(profile_path),
-        "summary_json": str(summary_path),
+        "high_demand_share_csv": str(demand_share_path),
+        "weather_summary_csv": str(weather_summary_path),
+        "summary_json": str(summary_json_path),
     }
