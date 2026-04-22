@@ -1,0 +1,18 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+dist/
+build/
+*.egg-info/
+
+# Results
+results/*
+!results/.gitkeep
+
+# Environment
+.env
+
+# Notebooks
+.ipynb_checkpoints
