@@ -16,6 +16,9 @@ uv run python scripts/00_fetch.py --config configs/base.yaml --run-name fetch-on
 uv run python scripts/01_prepare.py --config configs/base.yaml --run-name prepare-only
 ```
 
+The first `fetch` run downloads the public source dataset and caches the workshop CSV under
+`data/source/`. Later runs reuse that cached source file.
+
 ### Step 2. Inspect the current artifacts
 
 Look at the run-scoped outputs so you know what `fetch` and `prepare` already produce before you implement anything else.

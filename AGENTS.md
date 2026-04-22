@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This repository is a workshop scaffold for building the `analyze` and `report` stages of a small time-series analysis workflow built around a vendored bike-rental-demand dataset.
+This repository is a workshop scaffold for building the `analyze` and `report` stages of a small time-series analysis workflow built around a bike-rental-demand dataset that `fetch` downloads and caches locally.
 
 The starter state is intentional:
 

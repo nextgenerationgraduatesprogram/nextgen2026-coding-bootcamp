@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+import io
 from pathlib import Path
 import subprocess
 import sys
+import zipfile
 
 from omegaconf import OmegaConf
 import pandas as pd
@@ -40,7 +42,7 @@ def repo_root() -> Path:
 
 @pytest.fixture()
 def source_dataset_path(repo_root: Path) -> Path:
-    return repo_root / "data" / "source" / "bike_demand_source.csv"
+    return repo_root / "tests" / "fixtures" / "bike_demand_source.csv"
 
 
 @pytest.fixture()
@@ -57,6 +59,7 @@ def workshop_cfg(tmp_path: Path, source_dataset_path: Path):
                 "dataset_name": "bike_rental_demand",
                 "raw_artifact_name": "bike_demand_raw.csv",
                 "source_data_path": str(source_dataset_path),
+                "source_url": "https://archive.ics.uci.edu/ml/machine-learning-databases/00275/Bike-Sharing-Dataset.zip",
             },
             "prepare": {
                 "prepared_table_name": "prepared_demand.csv",
@@ -109,3 +112,28 @@ def make_raw_source_csv(tmp_path: Path):
         return csv_path
 
     return _make
+
+
+@pytest.fixture()
+def synthetic_bike_archive_bytes() -> bytes:
+    rows: list[dict[str, int]] = []
+    for day in range(5):
+        for hour in range(24):
+            rows.append(
+                {
+                    "dteday": f"2011-01-{day + 1:02d}",
+                    "hr": hour,
+                    "cnt": 25 + day * 10 + hour,
+                    "season": 1,
+                    "weathersit": 1 + int(8 <= hour < 18),
+                }
+            )
+
+    hour_csv = io.StringIO()
+    pd.DataFrame(rows).to_csv(hour_csv, index=False)
+
+    archive_buffer = io.BytesIO()
+    with zipfile.ZipFile(archive_buffer, mode="w") as archive:
+        archive.writestr("Bike-Sharing-Dataset/hour.csv", hour_csv.getvalue())
+
+    return archive_buffer.getvalue()

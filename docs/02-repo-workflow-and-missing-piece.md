@@ -6,7 +6,9 @@ This repository keeps the four-stage workflow shape intact: `fetch -> prepare ->
 
 ### Step 1. Run `fetch` and inspect the raw artifact
 
-Start by materializing the bike-demand dataset and looking at the raw payload.
+Start by materializing the bike-demand dataset and looking at the raw payload. The first run
+downloads the public source archive and caches the workshop CSV under `data/source/`; later runs
+reuse that cached source.
 
 ```bash
 uv run python scripts/00_fetch.py --config configs/base.yaml --run-name fetch-only
@@ -23,7 +25,8 @@ print(raw.head().to_string(index=False))
 PY
 ```
 
-The working `fetch` stage gives you the raw bike-demand table. You do not need to change it.
+The working `fetch` stage gives you the raw bike-demand table. You do not need to change it for the
+analyze/report task.
 
 ### Step 2. Run `prepare` and inspect the prepared artifacts
 

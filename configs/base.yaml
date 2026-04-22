@@ -10,6 +10,7 @@ fetch:
   dataset_name: bike_rental_demand
   raw_artifact_name: bike_demand_raw.csv
   source_data_path: data/source/bike_demand_source.csv
+  source_url: https://archive.ics.uci.edu/ml/machine-learning-databases/00275/Bike-Sharing-Dataset.zip
 
 prepare:
   prepared_table_name: prepared_demand.csv

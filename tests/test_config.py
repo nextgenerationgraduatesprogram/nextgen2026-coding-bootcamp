@@ -13,6 +13,7 @@ def test_load_config_reads_yaml_and_applies_overrides(tmp_path: Path):
         "fetch:\n"
         "  dataset_name: bike_rental_demand\n"
         "  source_data_path: data/source/bike_demand_source.csv\n"
+        "  source_url: https://archive.ics.uci.edu/ml/machine-learning-databases/00275/Bike-Sharing-Dataset.zip\n"
     )
 
     cfg = load_config(
@@ -22,6 +23,7 @@ def test_load_config_reads_yaml_and_applies_overrides(tmp_path: Path):
 
     assert cfg.run.output_root == "custom-runs"
     assert cfg.fetch.dataset_name == "patched_bike_demand"
+    assert cfg.fetch.source_url.endswith("Bike-Sharing-Dataset.zip")
 
 
 def test_compose_config_merges_parts_in_order_and_applies_overrides(tmp_path: Path):

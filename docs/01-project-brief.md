@@ -1,6 +1,9 @@
 # Project Brief
 
-This workshop uses a small vendored bike-rental-demand dataset, so the exercise stays fast and offline-friendly. The learning goal is to build two missing workflow stages from a bounded scaffold, not to build a forecasting model or redesign the project.
+This workshop uses a small bike-rental-demand dataset derived from a public UCI source. The `fetch`
+stage downloads and caches the workshop CSV locally, so the exercise stays bounded without requiring
+checked-in dataset files. The learning goal is to build two missing workflow stages from a bounded
+scaffold, not to build a forecasting model or redesign the project.
 
 The starter branch already completes `fetch` and `prepare`. Students must implement `analyze`, implement `report`, fill in the analyze/report config blocks, write their own tests, and then prove the full workflow works.
 
@@ -18,7 +21,7 @@ uv run python scripts/01_prepare.py --config configs/base.yaml --run-name prepar
 
 The starter expectations are:
 
-- `fetch` writes `bike_demand_raw.csv`
+- `fetch` downloads or reuses the cached workshop source and writes `bike_demand_raw.csv`
 - `prepare` writes `prepared_demand.csv`
 - `analyze` is not implemented yet
 - `report` is not implemented yet
