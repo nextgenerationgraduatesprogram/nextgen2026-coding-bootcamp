@@ -121,7 +121,7 @@ This document outlines the architectural and workflow rules for any AI agent ass
     2. Check the current branch state.
     3. `git fetch upstream` to check for new session branches (e.g., `starter/session-2`).
     4. Switch to the relevant session branch or create a specific feature branch if requested.
-    5. **Rule Restoration**: If `CODING_AGENT_RULES.md` is missing on the new branch, restore it using `git show <previous-branch>:CODING_AGENT_RULES.md > CODING_AGENT_RULES.md`.
+    5. **Rule Restoration**: If `AGENTS.md` is missing on the new branch, restore it using `git show <previous-branch>:AGENTS.md > AGENTS.md`.
     6. **README Merging**: Preserve the master project overview in `README.md`. If a session update replaces the README, merge the new session-specific content below the existing project overview and agent rules.
 - **Experiment Management**: Use the **"Branching Out"** method for experiments. Create dedicated branches for hypothesis testing or parameter variants (e.g., `experiment/quantile-0.95`) and commit both config snapshots and results to those branches.
 - **Commits**: Make small, logical commits. Use prefixing (e.g., `feat:`, `fix:`, `build:`, `docs:`) as per Conventional Commits where possible.
