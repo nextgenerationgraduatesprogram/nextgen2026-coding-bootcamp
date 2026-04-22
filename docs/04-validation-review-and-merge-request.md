@@ -4,6 +4,14 @@ Use this checklist after you have finished the student implementation. Run the c
 
 ## Steps
 
+### Step 0. Confirm `.env` exists
+
+If you have not already created it, make a repo-root `.env` from the example and set `OPENAI_API_KEY` before you validate the completed workflow.
+
+```bash
+cp example.env .env
+```
+
 ### Step 1. Run your analyze/report contract tests
 
 Run the tests you wrote for the missing stages.
@@ -23,7 +31,7 @@ uv run pytest -q
 
 ### Step 3. Run the full workflow
 
-Prove that the completed branch now runs `fetch -> prepare -> analyze -> report`.
+Prove that the completed branch now runs `fetch -> prepare -> analyze -> report`. If you want to refresh the cached raw dataset before validation, add `--force-download`.
 
 ```bash
 uv run python scripts/run_workflow.py --profile base --run-name review-check
@@ -39,10 +47,13 @@ find "$LATEST_RUN" -maxdepth 3 -type f | sort
 sed -n '1,220p' "$LATEST_RUN/report/report.md"
 python - <<'PY'
 from pathlib import Path
+import json
 import pandas as pd
 latest = sorted(Path("runs").glob("*"), key=lambda p: p.stat().st_mtime, reverse=True)[0]
-summary = latest / "analyze" / "class_image_summary.csv"
-print(pd.read_csv(summary).head(10).to_string(index=False))
+summary = latest / "analyze" / "evaluation_summary.json"
+predictions = latest / "analyze" / "message_predictions.csv"
+print(json.loads(summary.read_text(encoding="utf-8")))
+print(pd.read_csv(predictions).head(10).to_string(index=False))
 PY
 ```
 
@@ -61,7 +72,7 @@ git diff -- src/nextgen2026_coding_bootcamp/steps/analyze.py src/nextgen2026_cod
 Create a reviewable commit and push it to your remote branch.
 
 ```bash
-git add AGENTS.md README.md docs configs src tests
+git add AGENTS.md README.md docs configs src tests example.env
 git commit -m "Implement analyze and report workflow stages"
 git push -u origin <your-branch>
 ```

@@ -1,10 +1,20 @@
 # Project Brief
 
-This workshop uses the handwritten digits dataset that ships with `scikit-learn`, so the exercise stays fast and offline-friendly. The learning goal is to build two missing workflow stages from a bounded scaffold, not to train a classifier or redesign the project.
+This workshop uses the public UCI SMS Spam Collection dataset. The `fetch` stage downloads the raw data at runtime and caches it under `data/raw/`, so the repository stays free of checked-in dataset files. The learning goal is to build two missing workflow stages from a bounded scaffold, not to build a full spam detector or redesign the project.
 
 The starter branch already completes `fetch` and `prepare`. Students must implement `analyze`, implement `report`, fill in the analyze/report config blocks, write their own tests, and then prove the full workflow works.
 
 ## Steps
+
+### Step 0. Create a local `.env`
+
+Before you work on the LLM-backed `analyze` stage, create a `.env` file at the repository root from the checked-in example:
+
+```bash
+cp example.env .env
+```
+
+Then edit `.env` and set `OPENAI_API_KEY`. The scripts in this repo load `.env` automatically before config resolution. Keep the model name in YAML config.
 
 ### Step 1. Understand the starter state
 
@@ -18,8 +28,8 @@ uv run python scripts/01_prepare.py --config configs/base.yaml --run-name prepar
 
 The starter expectations are:
 
-- `fetch` writes `digits_raw.npz`
-- `prepare` writes `images.npy` and `metadata.csv`
+- `fetch` downloads the UCI dataset and writes `sms_spam_collection.tsv`
+- `prepare` writes `prepared_messages.csv`
 - `analyze` is not implemented yet
 - `report` is not implemented yet
 - the full workflow should not be considered complete until you finish the missing stages
@@ -28,57 +38,66 @@ The starter expectations are:
 
 When you are done, the workflow should produce these analyze artifacts:
 
-- `dataset_overview.json`
-- `class_image_summary.csv`
-- `class_representatives.png`
+- `message_predictions.csv`
+- `evaluation_summary.json`
 
 It should also produce this report artifact:
 
 - `report.md`
 
-`dataset_overview.json` must contain these keys:
+`message_predictions.csv` must have these columns in order:
+
+```text
+message_id,text,true_label,predicted_label,is_correct,raw_response
+```
+
+`evaluation_summary.json` must contain these keys:
 
 ```json
 {
-  "dataset_name": "sklearn_digits",
-  "n_images": 1797,
-  "n_classes": 10,
-  "image_height": 8,
-  "image_width": 8,
-  "labels": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
-  "images_per_class": {
-    "0": 178
+  "dataset_name": "sms_spam_collection",
+  "n_messages_prepared": 5574,
+  "sample_size": 25,
+  "sample_seed": 2026,
+  "labels": ["ham", "spam"],
+  "model": "your-model-name",
+  "temperature": 0.0,
+  "n_correct": 0,
+  "n_incorrect": 0,
+  "accuracy": 0.0,
+  "invalid_response_count": 0,
+  "confusion_matrix": {
+    "ham": {
+      "ham": 0,
+      "spam": 0,
+      "invalid": 0
+    }
   }
 }
-```
-
-`class_image_summary.csv` must have one row per digit class and these columns in order:
-
-```text
-label,n_images,mean_intensity,std_intensity,mean_edge_density
 ```
 
 `report.md` must contain these headings:
 
 ```text
-# Digits Workflow Report
+# SMS Classification Workflow Report
 ## Dataset Overview
 ## Analyze Artifacts
-## Representative Digits
-## Digit Class Profiles
+## Evaluation Summary
+## Prediction Examples
 ```
 
-### Step 3. Use the intended metric definitions
+### Step 3. Use the intended behaviour
 
-Keep the metrics simple and reviewable.
+Keep the scope small and reviewable.
 
-- `n_images`: the number of prepared images for the class
-- `mean_intensity`: the mean of the per-image mean intensities for that class
-- `std_intensity`: the population standard deviation of the per-image mean intensities for that class
-- `mean_edge_density`: the mean of the per-image edge densities for that class
-- `edge_density`: the fraction of horizontal and vertical neighboring pixel differences that are strictly greater than `edge_threshold`
+- `analyze` should draw a deterministic sample from `prepared_messages.csv`
+- `analyze` should call the model once per sampled message
+- `analyze` should normalize the model output into `ham`, `spam`, or `invalid`
+- `analyze` should preserve the raw model response for inspection
+- `report` must read the summary metrics from `evaluation_summary.json`
+- `report` must read the example rows from `message_predictions.csv`
 
-`report` must read these values from `class_image_summary.csv`. It must not recalculate them inside the report stage.
+`report` must not recompute the evaluation summary inside the report stage.
 
 ### Step 4. Implement the missing surfaces
 

@@ -1,4 +1,2 @@
 prepare:
-  image_array_name: images.npy
-  metadata_name: metadata.csv
-  normalize_divisor: 16.0
+  prepared_messages_name: prepared_messages.csv

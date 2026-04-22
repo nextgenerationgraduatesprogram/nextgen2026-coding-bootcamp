@@ -2,4 +2,4 @@ report:
   # Student task:
   # Mirror the final report settings from `configs/base.yaml` here.
   markdown_name: null
-  include_representative_image: null
+  max_examples: null

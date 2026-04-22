@@ -1,3 +1,5 @@
 fetch:
-  dataset_name: sklearn_digits
-  raw_artifact_name: digits_raw.npz
+  dataset_name: sms_spam_collection
+  uci_dataset_id: 228
+  raw_artifact_name: sms_spam_collection.tsv
+  force_download: false

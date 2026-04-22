@@ -4,29 +4,32 @@ This workshop starts from a partial workflow. `fetch` and `prepare` already work
 
 ## Steps
 
+### Step 0. Create `.env`
+
+Copy `example.env` to `.env` and set `OPENAI_API_KEY`. The scripts load `.env` automatically from the repository root.
+
 ### Step 1. Lock the final output contract
 
 Your completed workflow must produce these outputs:
 
-- `dataset_overview.json`
-- `class_image_summary.csv`
-- `class_representatives.png`
+- `message_predictions.csv`
+- `evaluation_summary.json`
 - `report.md`
 
-`class_image_summary.csv` must contain these columns in order:
+`message_predictions.csv` must contain these columns in order:
 
 ```text
-label,n_images,mean_intensity,std_intensity,mean_edge_density
+message_id,text,true_label,predicted_label,is_correct,raw_response
 ```
 
 `report.md` must contain these headings:
 
 ```text
-# Digits Workflow Report
+# SMS Classification Workflow Report
 ## Dataset Overview
 ## Analyze Artifacts
-## Representative Digits
-## Digit Class Profiles
+## Evaluation Summary
+## Prediction Examples
 ```
 
 ### Step 2. Implement the missing files
@@ -56,4 +59,4 @@ Use these files for workflow shape, artifact handoff, and thin stage-script stru
 
 ### Step 4. Stay inside scope
 
-Do not add model training, CNN code, workflow redesign, notebook-first solutions, or broad refactors. `report` must read analyze artifacts instead of recomputing metrics.
+Do not add model training, fine-tuning, complex evaluation frameworks, notebook-first solutions, or broad refactors. `report` must read analyze artifacts instead of recomputing evaluation metrics.

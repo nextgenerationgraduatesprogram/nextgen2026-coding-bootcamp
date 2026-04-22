@@ -1,14 +1,24 @@
-# Digits Image-Analysis Workshop Branch
+# SMS Classification Workflow Workshop Branch
 
 This branch is the shared starter for a short workflow workshop. The repository already contains the first half of the pipeline, `fetch -> prepare`, and intentionally leaves `analyze` and `report` incomplete for students to build.
 
 The workshop goal is to finish the missing stages without redesigning the workflow. Students should define their own behavioural tests, implement the analyze/report logic, fill in the analyze/report config blocks, and then validate the full workflow end to end.
 
+## Environment Setup
+
+Create a local `.env` file before you work on the LLM-backed `analyze` stage. The scripts load `.env` from the repository root automatically, and `.env` is already ignored by git.
+
+```bash
+cp example.env .env
+```
+
+Then edit `.env` and replace the placeholder value for `OPENAI_API_KEY`. Keep the model name in `configs/base.yaml` or a profile override.
+
 ## Steps
 
 ### Step 1. Start from the working baseline
 
-Run the starter test suite and inspect the first two workflow stages.
+Run the starter test suite and inspect the first two workflow stages. The first `fetch` run needs internet access so it can download the dataset; later runs reuse the cached raw TSV in `data/raw/` unless you pass `--force-download`.
 
 ```bash
 uv run pytest -q

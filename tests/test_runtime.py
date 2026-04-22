@@ -13,10 +13,10 @@ from nextgen2026_coding_bootcamp.runtime import (
 
 
 def test_make_run_id_includes_sanitized_run_name():
-    run_id = make_run_id(run_name="My Digits Run")
+    run_id = make_run_id(run_name="My SMS Run")
 
-    assert "My-Digits-Run" in run_id
-    assert re.match(r"^\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}_My-Digits-Run_[0-9a-f]{6}$", run_id)
+    assert "My-SMS-Run" in run_id
+    assert re.match(r"^\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}_My-SMS-Run_[0-9a-f]{6}$", run_id)
 
 
 def test_create_run_context_creates_run_directory(tmp_path: Path):

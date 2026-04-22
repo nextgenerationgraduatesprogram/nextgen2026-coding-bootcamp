@@ -4,9 +4,19 @@ This repository keeps the four-stage workflow shape intact: `fetch -> prepare ->
 
 ## Steps
 
+### Step 0. Create `.env` for later stages
+
+Create a `.env` file at the repository root from the checked-in example:
+
+```bash
+cp example.env .env
+```
+
+Set `OPENAI_API_KEY` in `.env`. The scripts load it automatically. You do not need the key for `fetch` or `prepare`, but you will need it once you implement `analyze`.
+
 ### Step 1. Run `fetch` and inspect the raw artifact
 
-Start by materializing the digits dataset and looking at the raw payload.
+Start by downloading the public SMS dataset and looking at the cached raw payload. Use `--force-download` when you want to refresh the cache explicitly.
 
 ```bash
 uv run python scripts/00_fetch.py --config configs/base.yaml --run-name fetch-only
@@ -14,22 +24,21 @@ LATEST_FETCH=$(ls -1dt runs/*fetch-only* | head -n1)
 find "$LATEST_FETCH" -maxdepth 3 -type f | sort
 python - <<'PY'
 from pathlib import Path
-import numpy as np
 latest = sorted(Path("runs").glob("*fetch-only*"), key=lambda p: p.stat().st_mtime)[-1]
-with np.load(latest / "fetch" / "digits_raw.npz") as raw:
-    print("files =", raw.files)
-    print("images.shape =", raw["images"].shape)
-    print("target.shape =", raw["target"].shape)
-    print("target_names =", raw["target_names"].tolist())
-    print("data.shape =", raw["data"].shape)
+raw_path = latest / "fetch" / "sms_spam_collection.tsv"
+lines = raw_path.read_text(encoding="utf-8").splitlines()
+print("line_count =", len(lines))
+print("first_rows =")
+for row in lines[:5]:
+    print(row)
 PY
 ```
 
-The working `fetch` stage gives you the unnormalized digits dataset. You do not need to change it.
+The working `fetch` stage gives you the raw SMS messages. You do not need to change it.
 
-### Step 2. Run `prepare` and inspect the prepared artifacts
+### Step 2. Run `prepare` and inspect the prepared artifact
 
-Then inspect the exact inputs that `analyze` must consume.
+Then inspect the exact input that `analyze` must consume.
 
 ```bash
 uv run python scripts/01_prepare.py --config configs/base.yaml --run-name prepare-only
@@ -37,27 +46,23 @@ LATEST_PREPARE=$(ls -1dt runs/*prepare-only* | head -n1)
 find "$LATEST_PREPARE" -maxdepth 3 -type f | sort
 python - <<'PY'
 from pathlib import Path
-import numpy as np
 import pandas as pd
 latest = sorted(Path("runs").glob("*prepare-only*"), key=lambda p: p.stat().st_mtime)[-1]
-images = np.load(latest / "prepare" / "images.npy")
-metadata = pd.read_csv(latest / "prepare" / "metadata.csv")
-print("images.shape =", images.shape)
-print("images.dtype =", images.dtype)
-print("images.min =", float(images.min()))
-print("images.max =", float(images.max()))
-print("metadata.columns =", metadata.columns.tolist())
-print(metadata.head().to_string(index=False))
-print(metadata["label"].value_counts().sort_index().to_string())
+prepared = pd.read_csv(latest / "prepare" / "prepared_messages.csv")
+print("prepared.shape =", prepared.shape)
+print("prepared.columns =", prepared.columns.tolist())
+print(prepared.head().to_string(index=False))
+print(prepared["label"].value_counts().sort_index().to_string())
 PY
 ```
 
 The current `prepare` contract is:
 
-- `images.npy`: shape `(1797, 8, 8)`, `float32`, normalized to `[0.0, 1.0]`
-- `metadata.csv`: columns `image_id` and `label`
+- `prepared_messages.csv`: columns `message_id`, `label`, and `text`
+- `label`: normalized to `ham` or `spam`
+- `text`: stripped and whitespace-normalized
 
-These are the only inputs the analyze stage needs.
+This is the only input the analyze stage needs.
 
 ### Step 3. Inspect the missing code
 
@@ -85,11 +90,12 @@ Use this structure for `analysis`:
 
 ```yaml
 analysis:
-  dataset_overview_name: dataset_overview.json
-  class_summary_name: class_image_summary.csv
-  representative_image_name: class_representatives.png
-  generate_representative_image: true
-  edge_threshold: 0.2
+  predictions_name: message_predictions.csv
+  evaluation_summary_name: evaluation_summary.json
+  sample_size: 25
+  sample_seed: 2026
+  model: YOUR_MODEL_NAME
+  temperature: 0.0
 ```
 
 Use this structure for `report`:
@@ -97,7 +103,7 @@ Use this structure for `report`:
 ```yaml
 report:
   markdown_name: report.md
-  include_representative_image: true
+  max_examples: 10
 ```
 
 ### Step 5. Implement the analyze stage
@@ -105,31 +111,28 @@ report:
 Use the provided helper names and return contract. The exact internals are up to you, but the stage should follow this structure:
 
 ```python
-def run_analyze(cfg, ctx=None, images_npy=None, metadata_csv=None) -> dict:
-    prepared_images_npy, prepared_metadata_csv = _resolve_prepare_inputs(...)
+def run_analyze(cfg, ctx=None, prepared_messages_csv=None) -> dict:
+    prepared_messages_path = _resolve_prepare_input(...)
     analysis_cfg = _validate_analysis_config(cfg)
 
     shared_output_dir = Path(cfg.paths.results_dir)
     shared_output_dir.mkdir(parents=True, exist_ok=True)
 
-    images = np.load(prepared_images_npy)
-    metadata = pd.read_csv(prepared_metadata_csv)
-
-    overview = build_dataset_overview(images=images, metadata=metadata)
-    summary = build_class_image_summary(
-        images=images,
-        metadata=metadata,
-        edge_threshold=analysis_cfg["edge_threshold"],
+    prepared_messages = pd.read_csv(prepared_messages_path)
+    sampled_messages = select_message_sample(
+        prepared_messages=prepared_messages,
+        sample_size=analysis_cfg["sample_size"],
+        sample_seed=analysis_cfg["sample_seed"],
     )
 
-    # write dataset_overview.json
-    # write class_image_summary.csv
-    # optionally write class_representatives.png
+    # call the model on each sampled message
+    # write message_predictions.csv
+    # write evaluation_summary.json
     # copy outputs into ctx.run_dir / "analyze" when ctx is provided
     # return the artifact dictionary expected by the workflow
 ```
 
-Reference code for shared-path and run-path behavior lives in `src/nextgen2026_coding_bootcamp/steps/prepare.py`.
+Reference code for shared-path and run-path behaviour lives in `src/nextgen2026_coding_bootcamp/steps/prepare.py`.
 
 ### Step 6. Implement the report stage
 
@@ -152,10 +155,10 @@ def run_report(cfg, ctx=None) -> dict:
 
 Your report should include:
 
-- dataset overview values from `dataset_overview.json`
+- dataset values from `evaluation_summary.json`
 - an analyze-artifact inventory
-- a representative image reference when enabled
-- a `Digit Class Profiles` Markdown table rendered from `class_image_summary.csv`
+- summary metrics from `evaluation_summary.json`
+- a `Prediction Examples` Markdown table rendered from `message_predictions.csv`
 
 ### Step 7. Write your own behavioural tests
 

@@ -1,7 +1,7 @@
 [project]
 name = "nextgen2026-coding-bootcamp"
 version = "0.1.0"
-description = "Config-driven, reproducible digits image-analysis workflow for the NextGen 2026 coding bootcamp."
+description = "Config-driven, reproducible SMS classification workflow scaffold for the NextGen 2026 coding bootcamp."
 readme = "README.md"
 authors = [
     { name = "Sam Cantrill", email = "sam.cantrill@data61.csiro.au" }
@@ -10,8 +10,10 @@ requires-python = ">=3.10"
 dependencies = [
     "matplotlib>=3.8.0",
     "numpy>=1.26.0",
+    "openai>=1.0.0",
     "omegaconf>=2.3.0",
     "pandas>=2.2.0",
+    "python-dotenv>=1.0.0",
     "scikit-learn>=1.5.0",
 ]
 

@@ -1,4 +1,4 @@
-"""Workshop package for reproducible digits image-analysis workflow exercises."""
+"""Workshop package for reproducible SMS classification workflow exercises."""
 
 
 def main() -> None:

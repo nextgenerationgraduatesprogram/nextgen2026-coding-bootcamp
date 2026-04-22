@@ -2,58 +2,56 @@ from __future__ import annotations
 
 import logging
 from pathlib import Path
-import shutil
 
-import numpy as np
 import pandas as pd
 
 logger = logging.getLogger(__name__)
 
-CLASS_IMAGE_SUMMARY_COLUMNS = [
-    "label",
-    "n_images",
-    "mean_intensity",
-    "std_intensity",
-    "mean_edge_density",
+MESSAGE_PREDICTION_COLUMNS = [
+    "message_id",
+    "text",
+    "true_label",
+    "predicted_label",
+    "is_correct",
+    "raw_response",
 ]
 
-DATASET_OVERVIEW_KEYS = [
+EVALUATION_SUMMARY_KEYS = [
     "dataset_name",
-    "n_images",
-    "n_classes",
-    "image_height",
-    "image_width",
+    "n_messages_prepared",
+    "sample_size",
+    "sample_seed",
     "labels",
-    "images_per_class",
+    "model",
+    "temperature",
+    "n_correct",
+    "n_incorrect",
+    "accuracy",
+    "invalid_response_count",
+    "confusion_matrix",
 ]
 
 
-def _resolve_prepare_inputs(
+def _resolve_prepare_input(
     cfg,
     ctx=None,
-    images_npy: Path | None = None,
-    metadata_csv: Path | None = None,
-) -> tuple[Path, Path]:
-    if images_npy is not None and metadata_csv is not None:
-        return images_npy, metadata_csv
+    prepared_messages_csv: Path | None = None,
+) -> Path:
+    if prepared_messages_csv is not None:
+        return prepared_messages_csv
 
     if ctx is not None:
         prepare_artifact = ctx.artifacts.get("prepare", {})
-        prepare_images = prepare_artifact.get("images_npy")
-        prepare_metadata = prepare_artifact.get("metadata_csv")
-        if prepare_images and prepare_metadata:
-            return Path(prepare_images), Path(prepare_metadata)
+        prepared_messages_path = prepare_artifact.get("prepared_messages_csv")
+        if prepared_messages_path:
+            return Path(prepared_messages_path)
 
-    shared_dir = Path(cfg.paths.intermediate_dir)
-    return (
-        shared_dir / str(cfg.prepare.image_array_name),
-        shared_dir / str(cfg.prepare.metadata_name),
-    )
+    return Path(cfg.paths.intermediate_dir) / str(cfg.prepare.prepared_messages_name)
 
 
 def _copy_to_run(shared_path: Path, run_path: Path) -> None:
     run_path.parent.mkdir(parents=True, exist_ok=True)
-    shutil.copy2(shared_path, run_path)
+    run_path.write_bytes(shared_path.read_bytes())
 
 
 def _require_value(section: str, key: str, value):
@@ -73,78 +71,76 @@ def _require_value(section: str, key: str, value):
 def _validate_analysis_config(cfg) -> dict[str, object]:
     analysis_cfg = cfg.analysis
     return {
-        "dataset_overview_name": str(
-            _require_value("analysis", "dataset_overview_name", analysis_cfg.dataset_overview_name)
+        "predictions_name": str(
+            _require_value("analysis", "predictions_name", analysis_cfg.predictions_name)
         ),
-        "class_summary_name": str(
-            _require_value("analysis", "class_summary_name", analysis_cfg.class_summary_name)
-        ),
-        "representative_image_name": str(
+        "evaluation_summary_name": str(
             _require_value(
                 "analysis",
-                "representative_image_name",
-                analysis_cfg.representative_image_name,
+                "evaluation_summary_name",
+                analysis_cfg.evaluation_summary_name,
             )
         ),
-        "generate_representative_image": bool(
-            _require_value(
-                "analysis",
-                "generate_representative_image",
-                analysis_cfg.generate_representative_image,
-            )
-        ),
-        "edge_threshold": float(
-            _require_value("analysis", "edge_threshold", analysis_cfg.edge_threshold)
+        "sample_size": int(_require_value("analysis", "sample_size", analysis_cfg.sample_size)),
+        "sample_seed": int(_require_value("analysis", "sample_seed", analysis_cfg.sample_seed)),
+        "model": str(_require_value("analysis", "model", analysis_cfg.model)),
+        "temperature": float(
+            _require_value("analysis", "temperature", analysis_cfg.temperature)
         ),
     }
 
 
-def calculate_edge_density(image: np.ndarray, threshold: float) -> float:
-    # Student task:
-    # 1. Compute the absolute pixel-to-pixel difference across rows and columns.
-    # 2. Count which differences are strictly greater than `threshold`.
-    # 3. Return the fraction of edge locations that exceed the threshold.
-    raise NotImplementedError(
-        "Implement `calculate_edge_density()` in "
-        "`src/nextgen2026_coding_bootcamp/steps/analyze.py`."
-    )
-
-
-def build_dataset_overview(images: np.ndarray, metadata: pd.DataFrame) -> dict:
-    # Student task:
-    # Build the JSON payload written to `dataset_overview.json`.
-    # Required keys are listed in `DATASET_OVERVIEW_KEYS`.
-    raise NotImplementedError(
-        "Implement `build_dataset_overview()` in "
-        "`src/nextgen2026_coding_bootcamp/steps/analyze.py`."
-    )
-
-
-def write_representative_image_montage(
-    images: np.ndarray,
-    metadata: pd.DataFrame,
-    output_path: Path,
-) -> None:
-    # Student task:
-    # Create a montage image with one representative digit per class and write it to
-    # `output_path`. `matplotlib` is already available in the project dependencies.
-    raise NotImplementedError(
-        "Implement `write_representative_image_montage()` in "
-        "`src/nextgen2026_coding_bootcamp/steps/analyze.py`."
-    )
-
-
-def build_class_image_summary(
-    images: np.ndarray,
-    metadata: pd.DataFrame,
-    edge_threshold: float,
+def select_message_sample(
+    prepared_messages: pd.DataFrame,
+    sample_size: int,
+    sample_seed: int,
 ) -> pd.DataFrame:
     # Student task:
-    # Return one row per label with the required columns in
-    # `CLASS_IMAGE_SUMMARY_COLUMNS`.
-    # Use `metadata['image_id']` to align rows with `images`.
+    # Select a bounded, deterministic sample from `prepared_messages`.
+    # The returned rows should preserve the original columns and use
+    # `sample_seed` so repeated runs are reproducible.
     raise NotImplementedError(
-        "Implement `build_class_image_summary()` in "
+        "Implement `select_message_sample()` in "
+        "`src/nextgen2026_coding_bootcamp/steps/analyze.py`."
+    )
+
+
+def build_classification_prompt(message_text: str) -> str:
+    # Student task:
+    # Build a short prompt that asks the model to classify one SMS message as either
+    # `ham` or `spam`.
+    raise NotImplementedError(
+        "Implement `build_classification_prompt()` in "
+        "`src/nextgen2026_coding_bootcamp/steps/analyze.py`."
+    )
+
+
+def parse_model_label(raw_response: str) -> str:
+    # Student task:
+    # Normalize the model response into one of:
+    # - `ham`
+    # - `spam`
+    # - `invalid`
+    raise NotImplementedError(
+        "Implement `parse_model_label()` in "
+        "`src/nextgen2026_coding_bootcamp/steps/analyze.py`."
+    )
+
+
+def build_evaluation_summary(
+    predictions: pd.DataFrame,
+    dataset_name: str,
+    n_messages_prepared: int,
+    sample_size: int,
+    sample_seed: int,
+    model: str,
+    temperature: float,
+) -> dict:
+    # Student task:
+    # Build the JSON payload written to `evaluation_summary.json`.
+    # Required keys are listed in `EVALUATION_SUMMARY_KEYS`.
+    raise NotImplementedError(
+        "Implement `build_evaluation_summary()` in "
         "`src/nextgen2026_coding_bootcamp/steps/analyze.py`."
     )
 
@@ -152,72 +148,86 @@ def build_class_image_summary(
 def run_analyze(
     cfg,
     ctx=None,
-    images_npy: Path | None = None,
-    metadata_csv: Path | None = None,
+    prepared_messages_csv: Path | None = None,
 ) -> dict:
-    prepared_images_npy, prepared_metadata_csv = _resolve_prepare_inputs(
+    prepared_messages_path = _resolve_prepare_input(
         cfg=cfg,
         ctx=ctx,
-        images_npy=images_npy,
-        metadata_csv=metadata_csv,
+        prepared_messages_csv=prepared_messages_csv,
     )
     analysis_cfg = _validate_analysis_config(cfg)
 
     shared_output_dir = Path(cfg.paths.results_dir)
     shared_output_dir.mkdir(parents=True, exist_ok=True)
 
-    shared_dataset_overview_json = (
-        shared_output_dir / analysis_cfg["dataset_overview_name"]
-    )
-    shared_class_image_summary_csv = (
-        shared_output_dir / analysis_cfg["class_summary_name"]
-    )
-    shared_class_representatives_png = (
-        shared_output_dir / analysis_cfg["representative_image_name"]
+    shared_predictions_csv = shared_output_dir / analysis_cfg["predictions_name"]
+    shared_evaluation_summary_json = (
+        shared_output_dir / analysis_cfg["evaluation_summary_name"]
     )
 
-    logger.info(
-        "[analyze]\nanalyze:start images=%s metadata=%s",
-        prepared_images_npy,
-        prepared_metadata_csv,
-    )
+    logger.info("[analyze]")
+    logger.info("analyze:start prepared_messages=%s", prepared_messages_path)
 
     # Student task:
     # Suggested shape for the implementation:
     #
-    # images = np.load(prepared_images_npy)
-    # metadata = pd.read_csv(prepared_metadata_csv)
-    # overview = build_dataset_overview(images=images, metadata=metadata)
-    # summary = build_class_image_summary(
-    #     images=images,
-    #     metadata=metadata,
-    #     edge_threshold=analysis_cfg["edge_threshold"],
+    # prepared_messages = pd.read_csv(prepared_messages_path)
+    # sampled_messages = select_message_sample(
+    #     prepared_messages=prepared_messages,
+    #     sample_size=analysis_cfg["sample_size"],
+    #     sample_seed=analysis_cfg["sample_seed"],
     # )
-    # if analysis_cfg["generate_representative_image"]:
-    #     write_representative_image_montage(...)
-    # summary.to_csv(shared_class_image_summary_csv, index=False)
+    #
+    # prediction_rows = []
+    # for row in sampled_messages.itertuples(index=False):
+    #     prompt = build_classification_prompt(row.text)
+    #     raw_response = ...  # call your chosen LLM client here
+    #     predicted_label = parse_model_label(raw_response)
+    #     prediction_rows.append(
+    #         {
+    #             "message_id": row.message_id,
+    #             "text": row.text,
+    #             "true_label": row.label,
+    #             "predicted_label": predicted_label,
+    #             "is_correct": predicted_label == row.label,
+    #             "raw_response": raw_response,
+    #         }
+    #     )
+    #
+    # predictions = pd.DataFrame(prediction_rows, columns=MESSAGE_PREDICTION_COLUMNS)
+    # evaluation_summary = build_evaluation_summary(
+    #     predictions=predictions,
+    #     dataset_name=str(cfg.fetch.dataset_name),
+    #     n_messages_prepared=len(prepared_messages),
+    #     sample_size=analysis_cfg["sample_size"],
+    #     sample_seed=analysis_cfg["sample_seed"],
+    #     model=str(analysis_cfg["model"]),
+    #     temperature=float(analysis_cfg["temperature"]),
+    # )
+    #
+    # predictions.to_csv(shared_predictions_csv, index=False)
+    # shared_evaluation_summary_json.write_text(..., encoding="utf-8")
     #
     # If `ctx` is provided, copy shared outputs into `ctx.run_dir / "analyze"` using
     # `_copy_to_run`, then return the run-scoped paths. Otherwise return shared paths.
     #
     # Expected return keys:
-    # - images_npy
-    # - metadata_csv
-    # - dataset_overview_json
-    # - class_image_summary_csv
-    # - class_representatives_png
-    # - shared_dataset_overview_json
-    # - shared_class_image_summary_csv
-    # - shared_class_representatives_png
-    # - expected_class_summary_columns
-    # - edge_threshold
+    # - prepared_messages_csv
+    # - message_predictions_csv
+    # - evaluation_summary_json
+    # - shared_message_predictions_csv
+    # - shared_evaluation_summary_json
+    # - expected_prediction_columns
+    # - sample_size
+    # - sample_seed
+    # - model
+    # - temperature
     # - copied_to_run
     raise NotImplementedError(
         "Student task: implement `run_analyze()` so the analyze stage reads "
-        "`images.npy` and `metadata.csv`, writes `dataset_overview.json`, "
-        "`class_image_summary.csv`, and `class_representatives.png`, then "
-        "returns the artifact dictionary described in this file. Reference "
-        "`src/nextgen2026_coding_bootcamp/steps/prepare.py`, "
-        "`docs/01-project-brief.md`, and "
-        "`docs/02-repo-workflow-and-missing-piece.md`."
+        "`prepared_messages.csv`, writes `message_predictions.csv` and "
+        "`evaluation_summary.json`, then returns the artifact dictionary "
+        "described in this file. Reference "
+        "`docs/01-project-brief.md`, `docs/02-repo-workflow-and-missing-piece.md`, "
+        "and `src/nextgen2026_coding_bootcamp/steps/prepare.py`."
     )

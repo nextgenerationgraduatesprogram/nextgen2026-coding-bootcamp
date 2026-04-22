@@ -1,13 +1,13 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+import io
 from pathlib import Path
 import subprocess
 import sys
-from types import SimpleNamespace
+import zipfile
 
 from omegaconf import OmegaConf
-import numpy as np
 import pandas as pd
 import pytest
 
@@ -46,24 +46,25 @@ def workshop_cfg(tmp_path: Path):
                 "results_dir": str(tmp_path / "results"),
             },
             "fetch": {
-                "dataset_name": "sklearn_digits",
-                "raw_artifact_name": "digits_raw.npz",
+                "dataset_name": "sms_spam_collection",
+                "uci_dataset_id": 228,
+                "raw_artifact_name": "sms_spam_collection.tsv",
+                "force_download": False,
             },
             "prepare": {
-                "image_array_name": "images.npy",
-                "metadata_name": "metadata.csv",
-                "normalize_divisor": 16.0,
+                "prepared_messages_name": "prepared_messages.csv",
             },
             "analysis": {
-                "dataset_overview_name": "dataset_overview.json",
-                "class_summary_name": "class_image_summary.csv",
-                "representative_image_name": "class_representatives.png",
-                "generate_representative_image": True,
-                "edge_threshold": 0.2,
+                "predictions_name": "message_predictions.csv",
+                "evaluation_summary_name": "evaluation_summary.json",
+                "sample_size": 25,
+                "sample_seed": 2026,
+                "model": "test-model",
+                "temperature": 0.0,
             },
             "report": {
                 "markdown_name": "report.md",
-                "include_representative_image": True,
+                "max_examples": 10,
             },
             "profile": {"name": "test"},
         }
@@ -101,44 +102,29 @@ def run_cli(repo_root: Path):
 
 
 @pytest.fixture()
-def synthetic_summary_inputs():
-    images = np.array(
-        [
-            [[0.0, 0.0], [0.0, 0.0]],
-            [[0.0, 1.0], [0.0, 1.0]],
-            [[1.0, 1.0], [1.0, 1.0]],
-        ],
-        dtype=np.float32,
-    )
-    metadata = pd.DataFrame(
+def synthetic_message_rows():
+    return pd.DataFrame(
         {
-            "image_id": [0, 1, 2],
-            "label": [0, 0, 1],
+            "message_id": [0, 1, 2],
+            "label": ["ham", "spam", "ham"],
+            "text": [
+                "See you at noon",
+                "WIN cash now",
+                "The server restart worked",
+            ],
         }
     )
-    return {
-        "images": images,
-        "metadata": metadata,
-    }
 
 
 @pytest.fixture()
-def synthetic_digits_dataset():
-    return SimpleNamespace(
-        images=np.array(
-            [
-                [[0.0, 1.0], [2.0, 3.0]],
-                [[4.0, 5.0], [6.0, 7.0]],
-            ],
-            dtype=np.float32,
-        ),
-        target=np.array([3, 7], dtype=np.int64),
-        target_names=np.arange(10, dtype=np.int64),
-        data=np.array(
-            [
-                [0.0, 1.0, 2.0, 3.0],
-                [4.0, 5.0, 6.0, 7.0],
-            ],
-            dtype=np.float32,
-        ),
-    )
+def synthetic_sms_archive_bytes():
+    buffer = io.BytesIO()
+    with zipfile.ZipFile(buffer, mode="w") as archive:
+        archive.writestr(
+            "SMSSpamCollection",
+            "ham\tSee you at noon\n"
+            "spam\tWIN cash now\n"
+            "ham\t The server restart worked \n"
+            "spam\tClaim your prize today\n",
+        )
+    return buffer.getvalue()

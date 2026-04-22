@@ -12,9 +12,18 @@ from nextgen2026_coding_bootcamp.steps.fetch import run_fetch
 def main() -> int:
     parser = build_stage_parser("Run the fetch stage.")
     parser.add_argument("--run-name", type=str, default=None, help="Optional run label")
+    parser.add_argument(
+        "--force-download",
+        action="store_true",
+        help="Re-download the raw dataset even if a cached copy already exists.",
+    )
     args = parser.parse_args()
 
-    cfg = load_config(args.config, overrides=args.set)
+    overrides = list(args.set)
+    if args.force_download:
+        overrides.append("fetch.force_download=true")
+
+    cfg = load_config(args.config, overrides=overrides)
     ctx = create_run_context(Path(cfg.run.output_root), run_name=args.run_name)
 
     configure_logging(ctx.run_dir / "run.log", level=args.log_level)

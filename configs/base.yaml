@@ -7,33 +7,34 @@ paths:
   results_dir: results
 
 fetch:
-  dataset_name: sklearn_digits
-  raw_artifact_name: digits_raw.npz
+  dataset_name: sms_spam_collection
+  uci_dataset_id: 228
+  raw_artifact_name: sms_spam_collection.tsv
+  force_download: false
 
 prepare:
-  image_array_name: images.npy
-  metadata_name: metadata.csv
-  normalize_divisor: 16.0
+  prepared_messages_name: prepared_messages.csv
 
 analysis:
   # Student task:
   # Fill these values in here and in `configs/stages/analyze.yaml`.
   # Final output names should be:
-  # - dataset_overview.json
-  # - class_image_summary.csv
-  # - class_representatives.png
-  dataset_overview_name: null
-  class_summary_name: null
-  representative_image_name: null
-  generate_representative_image: null
-  edge_threshold: null
+  # - message_predictions.csv
+  # - evaluation_summary.json
+  predictions_name: null
+  evaluation_summary_name: null
+  sample_size: null
+  sample_seed: null
+  # Keep the model name in config. The OpenAI API key is loaded from `.env`.
+  model: null
+  temperature: null
 
 report:
   # Student task:
   # Fill these values in here and in `configs/stages/report.yaml`.
   # Final output name should be `report.md`.
   markdown_name: null
-  include_representative_image: null
+  max_examples: null
 
 profile:
   name: base

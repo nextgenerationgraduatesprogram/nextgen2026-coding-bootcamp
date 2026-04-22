@@ -11,7 +11,7 @@ def test_write_manifest_serializes_run_context(tmp_path: Path):
     ctx = RunContext(
         run_id="run-123",
         run_dir=tmp_path,
-        artifacts={"fetch": {"raw_npz": "digits_raw.npz"}},
+        artifacts={"fetch": {"raw_tsv": "sms_spam_collection.tsv"}},
     )
 
     manifest_path = write_manifest(ctx=ctx, git_commit="abc123")
@@ -21,5 +21,5 @@ def test_write_manifest_serializes_run_context(tmp_path: Path):
     assert payload == {
         "run_id": "run-123",
         "git_commit": "abc123",
-        "artifacts": {"fetch": {"raw_npz": "digits_raw.npz"}},
+        "artifacts": {"fetch": {"raw_tsv": "sms_spam_collection.tsv"}},
     }

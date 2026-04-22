@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This repository is a workshop scaffold for building the `analyze` and `report` stages of a small image-analysis workflow built on `sklearn.datasets.load_digits`.
+This repository is a workshop scaffold for building the `analyze` and `report` stages of a small SMS classification workflow built around a public dataset downloaded by the `fetch` stage.
 
 The starter state is intentional:
 
@@ -22,7 +22,7 @@ The workflow stages are fixed and must remain in this order:
 3. `analyze`
 4. `report`
 
-`fetch` materializes the raw digits dataset. `prepare` writes normalized images plus metadata. `analyze` must write the derived analysis artifacts. `report` must consume analyze outputs and turn them into a Markdown report.
+`fetch` materializes the raw SMS dataset. `prepare` writes a clean tabular message file. `analyze` must write the model prediction artifacts. `report` must consume analyze outputs and turn them into a Markdown report.
 
 ## Canonical Commands
 
@@ -38,6 +38,8 @@ Run the working stages that students should inspect before implementing anything
 uv run python scripts/00_fetch.py --config configs/base.yaml --run-name fetch-only
 uv run python scripts/01_prepare.py --config configs/base.yaml --run-name prepare-only
 ```
+
+`fetch` downloads the dataset on the first run and reuses the cached raw TSV in `data/raw/` after that. Use `--force-download` to refresh the cache explicitly.
 
 Inspect the latest fetch or prepare run:
 
@@ -65,6 +67,8 @@ The student-owned implementation surface is:
 - `configs/stages/report.yaml`
 - student-authored analyze/report tests
 
+Students should create a repo-root `.env` from `example.env` and set `OPENAI_API_KEY` before they implement the LLM-backed analyze stage.
+
 Reference code for stage structure and artifact handoff lives in:
 
 - `src/nextgen2026_coding_bootcamp/steps/fetch.py`
@@ -73,9 +77,9 @@ Reference code for stage structure and artifact handoff lives in:
 
 ## Repo Boundaries
 
-This branch is an image-analysis exercise, not a model-training project. Do not add classifier training, CNN code, augmentation pipelines, notebooks as the main interface, async infrastructure, or a new workflow architecture. Keep the existing stage boundaries and artifact flow.
+This branch is a bounded SMS classification exercise, not a full spam-detection system. Do not add model training, fine-tuning, notebook-first solutions, async infrastructure, or a new workflow architecture. Keep the existing stage boundaries and artifact flow.
 
-`report` must consume outputs written by `analyze`. Do not duplicate class-summary calculations inside `report`, and do not bypass the analyze artifact contract just to make the report pass.
+`report` must consume outputs written by `analyze`. Do not duplicate the evaluation summary calculations inside `report`, and do not bypass the analyze artifact contract just to make the report pass.
 
 ## Delegation Defaults
 
@@ -102,4 +106,4 @@ Every completed student change should be checked against:
 
 ## Escalate to a Human Immediately
 
-Escalate if the requested change would redesign the workflow, alter the scientific framing beyond the workshop task, introduce model training, or require a broad refactor outside the bounded analyze/report/config extension.
+Escalate if the requested change would redesign the workflow, turn the exercise into a full production moderation system, introduce model training, or require a broad refactor outside the bounded analyze/report/config extension.

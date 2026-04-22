@@ -1,4 +1,4 @@
 profile:
   name: fast
 analysis:
-  generate_representative_image: false
+  sample_size: 10

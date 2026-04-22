@@ -23,12 +23,21 @@ def main() -> int:
     parser.add_argument("--profile", type=str, default="base", help="Profile under configs/profiles/")
     parser.add_argument("--part", action="append", default=[], help="Extra config part(s) merged last")
     parser.add_argument("--set", nargs="*", default=[], metavar="KEY=VALUE", help="Dotlist overrides")
+    parser.add_argument(
+        "--force-download",
+        action="store_true",
+        help="Re-download the raw dataset even if a cached copy already exists.",
+    )
     parser.add_argument("--log-level", type=str, default="INFO")
     parser.add_argument("--run-name", type=str, default=None)
     args = parser.parse_args()
 
     parts = [*DEFAULT_PARTS, f"profiles/{args.profile}.yaml", *args.part]
-    cfg = compose_config(Path("configs"), parts=parts, overrides=args.set)
+    overrides = list(args.set)
+    if args.force_download:
+        overrides.append("fetch.force_download=true")
+
+    cfg = compose_config(Path("configs"), parts=parts, overrides=overrides)
 
     ctx = create_run_context(Path(cfg.run.output_root), run_name=args.run_name)
     configure_logging(ctx.run_dir / "run.log", level=args.log_level)

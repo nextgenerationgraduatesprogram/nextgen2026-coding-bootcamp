@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import logging
-import os
 from pathlib import Path
 
 import pandas as pd
@@ -27,40 +26,28 @@ def _validate_report_config(cfg) -> dict[str, object]:
     analysis_cfg = cfg.analysis
     report_cfg = cfg.report
     return {
-        "dataset_overview_name": str(
-            _require_value("analysis", "dataset_overview_name", analysis_cfg.dataset_overview_name)
+        "predictions_name": str(
+            _require_value("analysis", "predictions_name", analysis_cfg.predictions_name)
         ),
-        "class_summary_name": str(
-            _require_value("analysis", "class_summary_name", analysis_cfg.class_summary_name)
-        ),
-        "representative_image_name": str(
+        "evaluation_summary_name": str(
             _require_value(
                 "analysis",
-                "representative_image_name",
-                analysis_cfg.representative_image_name,
+                "evaluation_summary_name",
+                analysis_cfg.evaluation_summary_name,
             )
         ),
         "markdown_name": str(
             _require_value("report", "markdown_name", report_cfg.markdown_name)
         ),
-        "include_representative_image": bool(
-            _require_value(
-                "report",
-                "include_representative_image",
-                report_cfg.include_representative_image,
-            )
-        ),
+        "max_examples": int(_require_value("report", "max_examples", report_cfg.max_examples)),
     }
 
 
 def _shared_analyze_paths(cfg, names: dict[str, object]) -> dict[str, Path | None]:
     results_dir = Path(cfg.paths.results_dir)
-    class_summary_path = results_dir / str(names["class_summary_name"])
-    representative_path = results_dir / str(names["representative_image_name"])
     return {
-        "dataset_overview_json": results_dir / str(names["dataset_overview_name"]),
-        "class_image_summary_csv": class_summary_path,
-        "class_representatives_png": representative_path if representative_path.exists() else None,
+        "message_predictions_csv": results_dir / str(names["predictions_name"]),
+        "evaluation_summary_json": results_dir / str(names["evaluation_summary_name"]),
     }
 
 
@@ -69,26 +56,20 @@ def _ctx_analyze_paths(cfg, ctx, names: dict[str, object]) -> dict[str, Path | N
     if not analyze_artifact:
         return _shared_analyze_paths(cfg, names)
 
-    overview_path = analyze_artifact.get("dataset_overview_json")
-    summary_path = analyze_artifact.get("class_image_summary_csv")
-    representative_path = analyze_artifact.get("class_representatives_png")
+    predictions_path = analyze_artifact.get("message_predictions_csv")
+    evaluation_path = analyze_artifact.get("evaluation_summary_json")
     return {
-        "dataset_overview_json": Path(overview_path),
-        "class_image_summary_csv": Path(summary_path) if summary_path else None,
-        "class_representatives_png": Path(representative_path) if representative_path else None,
+        "message_predictions_csv": Path(predictions_path) if predictions_path else None,
+        "evaluation_summary_json": Path(evaluation_path) if evaluation_path else None,
     }
 
 
-def _relative_path(target_path: Path, start_path: Path) -> str:
-    return Path(os.path.relpath(target_path, start=start_path)).as_posix()
-
-
-def _format_summary_for_markdown(summary_df: pd.DataFrame) -> pd.DataFrame:
+def _format_examples_for_markdown(examples_df: pd.DataFrame) -> pd.DataFrame:
     # Student task:
-    # Format integer columns as integers/strings and numeric metrics to 4 decimal places
-    # before rendering the table into Markdown.
+    # Format booleans and any other display values before turning example rows into
+    # Markdown.
     raise NotImplementedError(
-        "Implement `_format_summary_for_markdown()` in "
+        "Implement `_format_examples_for_markdown()` in "
         "`src/nextgen2026_coding_bootcamp/steps/report.py`."
     )
 
@@ -102,31 +83,32 @@ def _dataframe_to_markdown_table(df: pd.DataFrame) -> str:
     )
 
 
-def build_digit_class_profiles_section(class_summary_csv: Path | None) -> list[str]:
+def build_prediction_examples_section(
+    message_predictions_csv: Path | None,
+    max_examples: int,
+) -> list[str]:
     # Student task:
-    # Read `class_image_summary.csv` from analyze output and build the lines for the
-    # `## Digit Class Profiles` section. Raise `FileNotFoundError` if the summary is
-    # missing instead of recomputing anything inside report.
+    # Read `message_predictions.csv` from analyze output and build the lines for the
+    # `## Prediction Examples` section. Raise `FileNotFoundError` if the predictions
+    # file is missing instead of recomputing anything inside report.
     raise NotImplementedError(
-        "Implement `build_digit_class_profiles_section()` in "
+        "Implement `build_prediction_examples_section()` in "
         "`src/nextgen2026_coding_bootcamp/steps/report.py`."
     )
 
 
 def build_report_markdown(
-    output_dir: Path,
-    dataset_overview_json: Path,
-    class_image_summary_csv: Path | None,
-    class_representatives_png: Path | None,
-    include_representative_image: bool,
+    evaluation_summary_json: Path,
+    message_predictions_csv: Path | None,
+    max_examples: int,
 ) -> str:
     # Student task:
     # Build the report as a single Markdown string. The final report should contain:
-    # - `# Digits Workflow Report`
+    # - `# SMS Classification Workflow Report`
     # - `## Dataset Overview`
     # - `## Analyze Artifacts`
-    # - `## Representative Digits` (when enabled and present)
-    # - `## Digit Class Profiles`
+    # - `## Evaluation Summary`
+    # - `## Prediction Examples`
     raise NotImplementedError(
         "Implement `build_report_markdown()` in "
         "`src/nextgen2026_coding_bootcamp/steps/report.py`."
@@ -136,10 +118,9 @@ def build_report_markdown(
 def _write_report(
     output_dir: Path,
     markdown_name: str,
-    dataset_overview_json: Path,
-    class_image_summary_csv: Path | None,
-    class_representatives_png: Path | None,
-    include_representative_image: bool,
+    evaluation_summary_json: Path,
+    message_predictions_csv: Path | None,
+    max_examples: int,
 ) -> Path:
     # Student task:
     # Create `output_dir`, render the report with `build_report_markdown()`, write it
@@ -153,7 +134,7 @@ def _write_report(
 def run_report(cfg, ctx=None) -> dict:
     names = _validate_report_config(cfg)
     markdown_name = str(names["markdown_name"])
-    include_representative_image = bool(names["include_representative_image"])
+    max_examples = int(names["max_examples"])
 
     shared_output_dir = Path(cfg.paths.results_dir)
     shared_output_dir.mkdir(parents=True, exist_ok=True)
@@ -165,9 +146,9 @@ def run_report(cfg, ctx=None) -> dict:
         report_inputs = _ctx_analyze_paths(cfg, ctx, names)
 
     logger.info(
-        "[report]\nreport:start dataset_overview=%s class_summary=%s",
-        report_inputs["dataset_overview_json"],
-        report_inputs["class_image_summary_csv"],
+        "[report]\nreport:start evaluation_summary=%s predictions=%s",
+        report_inputs["evaluation_summary_json"],
+        report_inputs["message_predictions_csv"],
     )
 
     # Student task:
@@ -176,26 +157,25 @@ def run_report(cfg, ctx=None) -> dict:
     # shared_report_markdown = _write_report(
     #     output_dir=shared_output_dir,
     #     markdown_name=markdown_name,
-    #     dataset_overview_json=shared_inputs["dataset_overview_json"],
-    #     class_image_summary_csv=shared_inputs["class_image_summary_csv"],
-    #     class_representatives_png=shared_inputs["class_representatives_png"],
-    #     include_representative_image=include_representative_image,
+    #     evaluation_summary_json=shared_inputs["evaluation_summary_json"],
+    #     message_predictions_csv=shared_inputs["message_predictions_csv"],
+    #     max_examples=max_examples,
     # )
     #
     # If `ctx` is provided, write a run-scoped copy under `ctx.run_dir / "report"`
     # using `report_inputs`. Otherwise return the shared report path.
     #
     # Expected return keys:
-    # - dataset_overview_json
-    # - class_image_summary_csv
-    # - class_representatives_png
+    # - evaluation_summary_json
+    # - message_predictions_csv
     # - report_markdown
     # - shared_report_markdown
+    # - max_examples
     # - copied_to_run
     raise NotImplementedError(
         "Student task: implement `run_report()` so the report stage reads analyze "
-        "artifacts and writes `report.md` without recomputing summary metrics. "
+        "artifacts and writes `report.md` without recomputing the evaluation summary. "
         "Reference `docs/01-project-brief.md`, "
         "`docs/02-repo-workflow-and-missing-piece.md`, and "
-        "`src/nextgen2026_coding_bootcamp/steps/prepare.py` for the stage structure."
+        "`src/nextgen2026_coding_bootcamp/steps/prepare.py`."
     )
