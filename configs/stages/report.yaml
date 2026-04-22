@@ -1,4 +1,0 @@
-report:
-  write_plots: true
-  write_summary_markdown: true
-  figure_dpi: 150

@@ -1,112 +1,58 @@
-# Session 3 - Controlled Agent Collaboration for Workflow Extensions
+# Workshop Projects — Session 3
 
-This repository shows you how to use AI coding agents inside the Bike Sharing workflow without giving up control of the work. The session teaches a bounded, reviewable workflow where the agent helps draft specs, tests, plans, and review artifacts, while you keep control of approval, interpretation, and merge decisions.
+## What this workshop is
 
-Core operating rule:
+In this workshop, you will work in a small group on one bounded coding task inside a scaffolded repository. Each project uses the same overall workflow shape — `fetch`, `prepare`, `analyze`, and `report` — but applies it to a different type of problem. You will use AI coding tools as part of your workflow to understand the task, write a specification, implement a bounded change, test the result, and prepare a merge request.
 
-`define the problem -> clarify and approve the specification -> design behavioural tests -> implement those tests -> design the implementation plan -> implement the plan and supporting tests -> review and commit -> refine the workflow`
+The goal is not to build a complete project from scratch. The goal is to make one meaningful change to an existing workflow and review that change properly.
 
-## Start Here
+## Project options
 
-1. Read the docs map: [docs/README.md](./docs/README.md)
-2. Start with the workshop entry chapter: [docs/00-session-overview.md](./docs/00-session-overview.md)
-3. Review durable agent instructions: [AGENTS.md](./AGENTS.md)
+You will work on one of three project branches.
 
-## Coding Agent Setup
+- **Image processing**: Use a small public image dataset to generate a new analysis artifact and include it in the report output.
+- **Time series**: Use a small public time-series dataset to generate a new summary artifact and include it in the report output.
+- **Semantic analysis**: Use a small public text dataset and the OpenAI API to perform semantic analysis, and include the results in the report output.
 
-This session is tool-agnostic. Use any coding agent you prefer, but install and authenticate one before you start the workshop.
+Each project follows the same structure, but the data and implementation details differ.
 
-If you prefer working inside VS Code instead of a terminal-first CLI, official VS Code extensions are also available for Codex, Gemini Code Assist, and Claude Code.
+## Getting started
 
-### Shared Prerequisites
+First, create your own fork of this repository on GitHub. A fork is a Git hosting step, not a plain `git` step, so you cannot create one with `git` alone. If you already use GitHub CLI for this, that is also fine.
 
-- Git
-- Python plus [`uv`](https://docs.astral.sh/uv/)
-- Node.js 20+ if you plan to use an npm-installed agent CLI
-- VS Code if you plan to use an editor extension instead of the CLI
-
-```Bash
-# install nvm
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.4/install.sh | bash
-
-# restart your terminal, then install Node 20
-nvm install 20
-nvm use 20
-nvm alias default 20
-
-# verify
-node -v
-npm -v
-```
-
-### Option A: Codex CLI
+Then clone your fork of the repository and move into it.
 
 ```bash
-npm install -g @openai/codex
-codex
+git clone <your-fork-url>
+cd <repo-name>
 ```
 
-On first run, sign in with your ChatGPT account or an OpenAI API key.
-
-Official docs: <https://developers.openai.com/codex/cli>
-
-VS Code extension: <https://developers.openai.com/codex/ide>
-
-### Option B: Gemini CLI
+Then fetch the remote branches and create your own working branch from the project branch for your group.
 
 ```bash
-npm install -g @google/gemini-cli
-gemini
+git fetch origin
+git branch -r
+git switch -c <your-name>/<short-task-name> origin/<problem-branch>
+git push -u origin <your-name>/<short-task-name>
 ```
 
-On first run, choose `Sign in with Google`. If you prefer, you can also use a Gemini API key instead.
+You should now be working on your own branch, based on the problem branch for your project.
 
-Official docs:
+## What to read next
 
-- Install: <https://geminicli.com/docs/get-started/installation/>
-- Auth: <https://geminicli.com/docs/get-started/authentication/>
-- VS Code extension: <https://developers.google.com/gemini-code-assist/docs/set-up-gemini>
+Once you are on the correct problem branch, read these files in order:
 
-### Option C: Claude Code
+1. `docs/01-project-brief.md`
+2. `docs/02-project-workflow.md`
+3. `docs/03-agentic-workflow.md`
+4. `docs/04-validation-and-merge.md`
 
-Recommended installer from Anthropic:
+The project brief and repo workflow docs are branch-specific. The AI workflow and validation docs are shared.
 
-```bash
-curl -fsSL https://claude.ai/install.sh | bash
-claude
-```
+## Submission
 
-Alternative npm install:
+At the end of the workshop, commit your changes, push your branch, and open a merge request with:
 
-```bash
-npm install -g @anthropic-ai/claude-code
-claude
-```
-
-On first run, complete the browser login flow. Claude Code requires a paid Claude or Anthropic Console account.
-
-Official docs: <https://code.claude.com/docs/en/getting-started>
-
-VS Code extension: <https://code.claude.com/docs/en/vs-code>
-
-### Recommendation
-
-Pick one agent and use it consistently for the session. The repository commands stay the same regardless of which agent you use.
-
-## Baseline Health Check
-
-Run these before any delegation:
-
-```bash
-uv run pytest -q
-uv run python scripts/run_workflow.py --profile base --run-name baseline-check
-```
-
-## What This Session Teaches
-
-- choosing a bounded workflow change inside `fetch -> prepare -> analyze -> report`
-- clarifying the problem specification before feature work begins
-- defining executable behavioural tests before feature implementation
-- designing an implementation plan with deliberate context and file references
-- reviewing the work against specs, tests, artifacts, and git state before commit
-- turning repeated lessons into durable repo instructions, tests, and templates
+- a short description of what you changed
+- what checks you ran
+- anything still incomplete or uncertain
