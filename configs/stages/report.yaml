@@ -1,4 +1,5 @@
 report:
-  write_plots: true
-  write_summary_markdown: true
-  figure_dpi: 150
+  # Student task:
+  # Mirror the final report settings from `configs/base.yaml` here.
+  markdown_name: null
+  include_representative_image: null

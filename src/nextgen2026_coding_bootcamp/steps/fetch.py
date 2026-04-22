@@ -1,104 +1,69 @@
 from __future__ import annotations
 
 from pathlib import Path
-from urllib.parse import urlparse
-from urllib.request import urlretrieve
-from zipfile import ZipFile
 import logging
 import shutil
+
+import numpy as np
+from sklearn.datasets import load_digits
 
 logger = logging.getLogger(__name__)
 
 
-def _archive_name_from_url(source_url: str) -> str:
-    parsed = urlparse(source_url)
-    if parsed.scheme not in {"http", "https"}:
-        raise ValueError("fetch.source_url must be an HTTP(S) URL")
-    name = Path(parsed.path).name
-    return name or "dataset.zip"
-
-
-def _extract_archive_member(archive_path: Path, archive_member: str, output_csv: Path) -> None:
-    with ZipFile(archive_path) as zf:
-        with zf.open(archive_member) as src, output_csv.open("wb") as dst:
-            dst.write(src.read())
-
-
-def _copy_if_missing(source_path: Path, destination_path: Path) -> bool:
-    if destination_path.exists():
-        return False
-    shutil.copy2(source_path, destination_path)
-    return True
+def _copy_to_run(shared_path: Path, run_path: Path) -> None:
+    run_path.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(shared_path, run_path)
 
 
 def run_fetch(cfg, ctx=None) -> dict:
-    source_url = str(cfg.fetch.source_url)
-    archive_member = str(cfg.fetch.archive_member)
-    archive_name = _archive_name_from_url(source_url)
-    csv_name = Path(archive_member).name
+    dataset_name = str(cfg.fetch.dataset_name)
+    raw_artifact_name = str(cfg.fetch.raw_artifact_name)
 
     raw_dir = Path(cfg.paths.raw_dir)
     raw_dir.mkdir(parents=True, exist_ok=True)
-    cached_archive_path = raw_dir / archive_name
-    cached_csv_path = raw_dir / csv_name
-
-    downloaded_archive = False
-    extracted_member = False
+    shared_raw_npz = raw_dir / raw_artifact_name
 
     logger.info("[fetch]")
-    logger.info("fetch:start source_url=%s cache_dir=%s", source_url, raw_dir)
+    logger.info("fetch:start dataset=%s shared_output=%s", dataset_name, shared_raw_npz)
 
-    if not cached_archive_path.exists():
-        logger.info("fetch:download archive=%s", cached_archive_path)
-        urlretrieve(source_url, cached_archive_path)
-        downloaded_archive = True
-    else:
-        logger.info("fetch:reuse_cached_archive archive=%s", cached_archive_path)
+    digits = load_digits()
+    images = digits.images.astype(np.float32)
+    targets = digits.target.astype(np.int64)
+    target_names = np.asarray(digits.target_names, dtype=np.int64)
+    flat_data = digits.data.astype(np.float32)
 
-    if not cached_csv_path.exists():
-        logger.info(
-            "fetch:extract_member archive=%s member=%s output=%s",
-            cached_archive_path,
-            archive_member,
-            cached_csv_path,
-        )
-        _extract_archive_member(cached_archive_path, archive_member, cached_csv_path)
-        extracted_member = True
-    else:
-        logger.info("fetch:reuse_cached_csv csv=%s", cached_csv_path)
+    np.savez_compressed(
+        shared_raw_npz,
+        images=images,
+        target=targets,
+        target_names=target_names,
+        data=flat_data,
+    )
 
     if ctx is None:
-        archive_path = cached_archive_path
-        extracted_csv_path = cached_csv_path
-        copied_archive_to_run = False
-        copied_csv_to_run = False
+        output_raw_npz = shared_raw_npz
+        copied_to_run = False
     else:
-        stage_output_dir = ctx.run_dir / "fetch"
-        stage_output_dir.mkdir(parents=True, exist_ok=True)
-
-        archive_path = stage_output_dir / archive_name
-        extracted_csv_path = stage_output_dir / csv_name
-
-        copied_archive_to_run = _copy_if_missing(cached_archive_path, archive_path)
-        copied_csv_to_run = _copy_if_missing(cached_csv_path, extracted_csv_path)
+        run_stage_dir = ctx.run_dir / "fetch"
+        run_stage_dir.mkdir(parents=True, exist_ok=True)
+        output_raw_npz = run_stage_dir / raw_artifact_name
+        _copy_to_run(shared_raw_npz, output_raw_npz)
+        copied_to_run = True
 
     logger.info(
-        "fetch:finish archive=%s extracted_csv=%s downloaded=%s extracted=%s\n",
-        archive_path,
-        extracted_csv_path,
-        downloaded_archive,
-        extracted_member,
+        "fetch:finish images=%d classes=%d image_shape=%s output=%s\n",
+        images.shape[0],
+        len(target_names),
+        tuple(images.shape[1:]),
+        output_raw_npz,
     )
 
     return {
-        "source_url": source_url,
-        "archive_path": str(archive_path),
-        "archive_member": archive_member,
-        "raw_csv": str(extracted_csv_path),
-        "cache_archive_path": str(cached_archive_path),
-        "cache_raw_csv": str(cached_csv_path),
-        "downloaded_archive": downloaded_archive,
-        "extracted_member": extracted_member,
-        "copied_archive_to_run": copied_archive_to_run,
-        "copied_csv_to_run": copied_csv_to_run,
+        "dataset_name": dataset_name,
+        "raw_npz": str(output_raw_npz),
+        "shared_raw_npz": str(shared_raw_npz),
+        "n_images": int(images.shape[0]),
+        "n_classes": int(len(target_names)),
+        "image_shape": list(images.shape[1:]),
+        "copied_to_run": copied_to_run,
     }

@@ -1,19 +1,28 @@
-# Session 3 Templates
+# Agent Templates
 
-These are the canonical blank templates for the specification-first workshop flow. Keep these files as source templates. Ask the agent to draft filled versions into `agents/docs/` so you can review them.
+These templates support the artifact-driven workflow in `docs/03-ai-agent-workflow.md`.
 
-1. `01-task-spec.md`
-   Use when you have chosen a task and want the agent to draft the approved task spec, including bounded scope, design feedback, and behavioural expectations.
-2. `02-implementation-plan.md`
-   Use after the task spec is approved and behavioural tests exist to draft the bounded implementation plan, minimal context bundle, and ordered work sequence.
-3. `03-review-and-decision.md`
-   Use after implementation to draft the review record, evidence summary, decision recommendation, and next git action.
-4. `04-hardening-note.md`
-   Use at the end of the session to capture what should become durable repo structure or repeatable workflow.
+## Numbered Convention
 
-Naming pattern for drafts:
+- `agents/templates/01-requirements-template.md`
+- `agents/templates/02-behavioural-tests-template.md`
 
-- `agents/docs/<task-slug>-01-task-spec.md`
-- `agents/docs/<task-slug>-02-implementation-plan.md`
-- `agents/docs/<task-slug>-03-review-and-decision.md`
-- `agents/docs/<task-slug>-04-hardening-note.md`
+Only steps 1 and 2 are precreated in the repo.
+
+For steps 3 through 5, the user should create these template files themselves before prompting the agent:
+
+- `agents/templates/03-implementation-plan-template.md`
+- `agents/templates/04-implementation-request-template.md`
+- `agents/templates/05-validation-template.md`
+
+## Generated Artifact Naming
+
+Ask the agent to write completed step artifacts into `agents/docs/` using a shared task slug:
+
+- `agents/docs/<task-slug>-01-requirements.md`
+- `agents/docs/<task-slug>-02-behavioural-tests.md`
+- `agents/docs/<task-slug>-03-implementation-plan.md`
+- `agents/docs/<task-slug>-04-implementation-request.md`
+- `agents/docs/<task-slug>-05-validation.md`
+
+Keep the same task slug across all five files for one feature.

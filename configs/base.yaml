@@ -1,0 +1,39 @@
+run:
+  output_root: runs
+
+paths:
+  raw_dir: data/raw
+  intermediate_dir: data/intermediate
+  results_dir: results
+
+fetch:
+  dataset_name: sklearn_digits
+  raw_artifact_name: digits_raw.npz
+
+prepare:
+  image_array_name: images.npy
+  metadata_name: metadata.csv
+  normalize_divisor: 16.0
+
+analysis:
+  # Student task:
+  # Fill these values in here and in `configs/stages/analyze.yaml`.
+  # Final output names should be:
+  # - dataset_overview.json
+  # - class_image_summary.csv
+  # - class_representatives.png
+  dataset_overview_name: null
+  class_summary_name: null
+  representative_image_name: null
+  generate_representative_image: null
+  edge_threshold: null
+
+report:
+  # Student task:
+  # Fill these values in here and in `configs/stages/report.yaml`.
+  # Final output name should be `report.md`.
+  markdown_name: null
+  include_representative_image: null
+
+profile:
+  name: base

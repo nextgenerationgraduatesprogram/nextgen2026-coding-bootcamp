@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-import json
 import logging
+import os
 from pathlib import Path
 
 import pandas as pd
@@ -9,133 +9,193 @@ import pandas as pd
 logger = logging.getLogger(__name__)
 
 
-def _resolve_analyze_inputs(cfg, ctx=None) -> tuple[Path, Path, Path]:
-    if ctx is not None:
-        analyze_artifact = ctx.artifacts.get("analyze", {})
-        if analyze_artifact:
-            hourly_profile = analyze_artifact.get("hourly_profile_csv")
-            high_demand_share = analyze_artifact.get("high_demand_share_csv")
-            summary_json = analyze_artifact.get("summary_json")
-            if hourly_profile and high_demand_share and summary_json:
-                return (
-                    Path(hourly_profile),
-                    Path(high_demand_share),
-                    Path(summary_json),
-                )
+def _require_value(section: str, key: str, value):
+    if value is None:
+        raise ValueError(
+            f"Missing config value `{section}.{key}`. "
+            "Update both `configs/base.yaml` and the matching stage fragment."
+        )
+    if isinstance(value, str) and not value.strip():
+        raise ValueError(
+            f"Blank config value `{section}.{key}`. "
+            "Update both `configs/base.yaml` and the matching stage fragment."
+        )
+    return value
 
-    base = Path(cfg.paths.results_dir)
-    return (
-        base / "hourly_profile.csv",
-        base / "high_demand_share_by_hour.csv",
-        base / "high_demand_summary.json",
+
+def _validate_report_config(cfg) -> dict[str, object]:
+    analysis_cfg = cfg.analysis
+    report_cfg = cfg.report
+    return {
+        "dataset_overview_name": str(
+            _require_value("analysis", "dataset_overview_name", analysis_cfg.dataset_overview_name)
+        ),
+        "class_summary_name": str(
+            _require_value("analysis", "class_summary_name", analysis_cfg.class_summary_name)
+        ),
+        "representative_image_name": str(
+            _require_value(
+                "analysis",
+                "representative_image_name",
+                analysis_cfg.representative_image_name,
+            )
+        ),
+        "markdown_name": str(
+            _require_value("report", "markdown_name", report_cfg.markdown_name)
+        ),
+        "include_representative_image": bool(
+            _require_value(
+                "report",
+                "include_representative_image",
+                report_cfg.include_representative_image,
+            )
+        ),
+    }
+
+
+def _shared_analyze_paths(cfg, names: dict[str, object]) -> dict[str, Path | None]:
+    results_dir = Path(cfg.paths.results_dir)
+    class_summary_path = results_dir / str(names["class_summary_name"])
+    representative_path = results_dir / str(names["representative_image_name"])
+    return {
+        "dataset_overview_json": results_dir / str(names["dataset_overview_name"]),
+        "class_image_summary_csv": class_summary_path,
+        "class_representatives_png": representative_path if representative_path.exists() else None,
+    }
+
+
+def _ctx_analyze_paths(cfg, ctx, names: dict[str, object]) -> dict[str, Path | None]:
+    analyze_artifact = ctx.artifacts.get("analyze", {})
+    if not analyze_artifact:
+        return _shared_analyze_paths(cfg, names)
+
+    overview_path = analyze_artifact.get("dataset_overview_json")
+    summary_path = analyze_artifact.get("class_image_summary_csv")
+    representative_path = analyze_artifact.get("class_representatives_png")
+    return {
+        "dataset_overview_json": Path(overview_path),
+        "class_image_summary_csv": Path(summary_path) if summary_path else None,
+        "class_representatives_png": Path(representative_path) if representative_path else None,
+    }
+
+
+def _relative_path(target_path: Path, start_path: Path) -> str:
+    return Path(os.path.relpath(target_path, start=start_path)).as_posix()
+
+
+def _format_summary_for_markdown(summary_df: pd.DataFrame) -> pd.DataFrame:
+    # Student task:
+    # Format integer columns as integers/strings and numeric metrics to 4 decimal places
+    # before rendering the table into Markdown.
+    raise NotImplementedError(
+        "Implement `_format_summary_for_markdown()` in "
+        "`src/nextgen2026_coding_bootcamp/steps/report.py`."
+    )
+
+
+def _dataframe_to_markdown_table(df: pd.DataFrame) -> str:
+    # Student task:
+    # Turn the input DataFrame into a GitHub-flavored Markdown table string.
+    raise NotImplementedError(
+        "Implement `_dataframe_to_markdown_table()` in "
+        "`src/nextgen2026_coding_bootcamp/steps/report.py`."
+    )
+
+
+def build_digit_class_profiles_section(class_summary_csv: Path | None) -> list[str]:
+    # Student task:
+    # Read `class_image_summary.csv` from analyze output and build the lines for the
+    # `## Digit Class Profiles` section. Raise `FileNotFoundError` if the summary is
+    # missing instead of recomputing anything inside report.
+    raise NotImplementedError(
+        "Implement `build_digit_class_profiles_section()` in "
+        "`src/nextgen2026_coding_bootcamp/steps/report.py`."
+    )
+
+
+def build_report_markdown(
+    output_dir: Path,
+    dataset_overview_json: Path,
+    class_image_summary_csv: Path | None,
+    class_representatives_png: Path | None,
+    include_representative_image: bool,
+) -> str:
+    # Student task:
+    # Build the report as a single Markdown string. The final report should contain:
+    # - `# Digits Workflow Report`
+    # - `## Dataset Overview`
+    # - `## Analyze Artifacts`
+    # - `## Representative Digits` (when enabled and present)
+    # - `## Digit Class Profiles`
+    raise NotImplementedError(
+        "Implement `build_report_markdown()` in "
+        "`src/nextgen2026_coding_bootcamp/steps/report.py`."
+    )
+
+
+def _write_report(
+    output_dir: Path,
+    markdown_name: str,
+    dataset_overview_json: Path,
+    class_image_summary_csv: Path | None,
+    class_representatives_png: Path | None,
+    include_representative_image: bool,
+) -> Path:
+    # Student task:
+    # Create `output_dir`, render the report with `build_report_markdown()`, write it
+    # to disk, and return the path to the Markdown file.
+    raise NotImplementedError(
+        "Implement `_write_report()` in "
+        "`src/nextgen2026_coding_bootcamp/steps/report.py`."
     )
 
 
 def run_report(cfg, ctx=None) -> dict:
-    (
-        hourly_profile_path,
-        high_demand_share_path,
-        summary_path,
-    ) = _resolve_analyze_inputs(
-        cfg=cfg,
-        ctx=ctx,
-    )
+    names = _validate_report_config(cfg)
+    markdown_name = str(names["markdown_name"])
+    include_representative_image = bool(names["include_representative_image"])
 
+    shared_output_dir = Path(cfg.paths.results_dir)
+    shared_output_dir.mkdir(parents=True, exist_ok=True)
+
+    shared_inputs = _shared_analyze_paths(cfg, names)
     if ctx is None:
-        output_dir = Path(cfg.paths.results_dir)
+        report_inputs = shared_inputs
     else:
-        output_dir = ctx.run_dir / "report"
-    output_dir.mkdir(parents=True, exist_ok=True)
-
-    logger.info("[report]")
-    logger.info(
-        "report:start hourly_profile=%s high_demand_share=%s",
-        hourly_profile_path,
-        high_demand_share_path,
-    )
-
-    hourly_profile = pd.read_csv(hourly_profile_path)
-    high_demand_share_by_hour = pd.read_csv(high_demand_share_path)
-
-    figure_one_path = output_dir / "hourly_demand_by_day_type.png"
-    figure_two_path = output_dir / "high_demand_share_by_hour.png"
-    summary_md_path = output_dir / "analysis_summary.md"
-
-    write_plots = bool(cfg.report.write_plots)
-    write_summary_markdown = bool(cfg.report.write_summary_markdown)
-    figure_dpi = int(getattr(cfg.report, "figure_dpi", 150))
-
-    if write_plots:
-        import matplotlib.pyplot as plt
-
-        fig1, ax1 = plt.subplots(figsize=(10, 5))
-        for day_type, group in hourly_profile.groupby("day_type"):
-            ax1.plot(group["hour"], group["mean_rentals"], marker="o", label=day_type)
-        ax1.set_title("Mean hourly bike rentals by day type")
-        ax1.set_xlabel("Hour of day")
-        ax1.set_ylabel("Mean rentals")
-        ax1.legend()
-        ax1.grid(alpha=0.3)
-        fig1.tight_layout()
-        fig1.savefig(figure_one_path, dpi=figure_dpi)
-        plt.close(fig1)
-
-        fig2, ax2 = plt.subplots(figsize=(10, 5))
-        ax2.bar(
-            high_demand_share_by_hour["hour"],
-            high_demand_share_by_hour["high_demand_share"],
-        )
-        ax2.set_title("Share of high-demand observations by hour")
-        ax2.set_xlabel("Hour of day")
-        ax2.set_ylabel("High-demand share")
-        ax2.grid(axis="y", alpha=0.3)
-        fig2.tight_layout()
-        fig2.savefig(figure_two_path, dpi=figure_dpi)
-        plt.close(fig2)
-
-    summary_payload = None
-    if summary_path.exists():
-        summary_payload = json.loads(summary_path.read_text())
-
-    if write_summary_markdown:
-        top_hour_row = high_demand_share_by_hour.sort_values(
-            "high_demand_share",
-            ascending=False,
-        ).iloc[0]
-
-        lines = ["# Analysis Summary", ""]
-        if summary_payload is not None:
-            lines.extend(
-                [
-                    f"- High-demand quantile: `{summary_payload['high_demand_quantile']}`",
-                    f"- High-demand threshold: `{summary_payload['high_demand_threshold']:.3f}`",
-                    f"- Rows analyzed: `{summary_payload['rows_in']}`",
-                    f"- High-demand rows: `{summary_payload['rows_high_demand']}`",
-                ]
-            )
-        lines.extend(
-            [
-                f"- Hour with highest high-demand share: `{int(top_hour_row['hour'])}`",
-                f"- Highest high-demand share value: `{float(top_hour_row['high_demand_share']):.3f}`",
-                "",
-                "Generated by `run_report` from analyze-stage artifacts.",
-            ]
-        )
-        summary_md_path.write_text("\n".join(lines) + "\n")
+        report_inputs = _ctx_analyze_paths(cfg, ctx, names)
 
     logger.info(
-        "report:finish write_plots=%s write_summary_markdown=%s\n",
-        write_plots,
-        write_summary_markdown,
+        "[report]\nreport:start dataset_overview=%s class_summary=%s",
+        report_inputs["dataset_overview_json"],
+        report_inputs["class_image_summary_csv"],
     )
 
-    return {
-        "hourly_profile_csv": str(hourly_profile_path),
-        "high_demand_share_csv": str(high_demand_share_path),
-        "summary_json": str(summary_path),
-        "figure_one_png": str(figure_one_path) if write_plots else None,
-        "figure_two_png": str(figure_two_path) if write_plots else None,
-        "summary_markdown": str(summary_md_path) if write_summary_markdown else None,
-        "write_plots": write_plots,
-        "write_summary_markdown": write_summary_markdown,
-    }
+    # Student task:
+    # Suggested shape for the implementation:
+    #
+    # shared_report_markdown = _write_report(
+    #     output_dir=shared_output_dir,
+    #     markdown_name=markdown_name,
+    #     dataset_overview_json=shared_inputs["dataset_overview_json"],
+    #     class_image_summary_csv=shared_inputs["class_image_summary_csv"],
+    #     class_representatives_png=shared_inputs["class_representatives_png"],
+    #     include_representative_image=include_representative_image,
+    # )
+    #
+    # If `ctx` is provided, write a run-scoped copy under `ctx.run_dir / "report"`
+    # using `report_inputs`. Otherwise return the shared report path.
+    #
+    # Expected return keys:
+    # - dataset_overview_json
+    # - class_image_summary_csv
+    # - class_representatives_png
+    # - report_markdown
+    # - shared_report_markdown
+    # - copied_to_run
+    raise NotImplementedError(
+        "Student task: implement `run_report()` so the report stage reads analyze "
+        "artifacts and writes `report.md` without recomputing summary metrics. "
+        "Reference `docs/01-project-brief.md`, "
+        "`docs/02-repo-workflow-and-missing-piece.md`, and "
+        "`src/nextgen2026_coding_bootcamp/steps/prepare.py` for the stage structure."
+    )

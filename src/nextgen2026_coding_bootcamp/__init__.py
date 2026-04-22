@@ -1,4 +1,4 @@
-"""Session 2 workflow package for reproducible bike-share analyses."""
+"""Workshop package for reproducible digits image-analysis workflow exercises."""
 
 
 def main() -> None:

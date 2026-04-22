@@ -10,7 +10,7 @@ from nextgen2026_coding_bootcamp.steps.analyze import run_analyze
 
 
 def main() -> int:
-    parser = build_stage_parser("Run the report stage.")
+    parser = build_stage_parser("Run the analyze stage.")
     parser.add_argument("--run-name", type=str, default=None, help="Optional run label")
     args = parser.parse_args()
 
@@ -27,4 +27,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

@@ -1,2 +1,8 @@
 analysis:
-  high_demand_quantile: 0.9
+  # Student task:
+  # Mirror the final analyze settings from `configs/base.yaml` here.
+  dataset_overview_name: null
+  class_summary_name: null
+  representative_image_name: null
+  generate_representative_image: null
+  edge_threshold: null

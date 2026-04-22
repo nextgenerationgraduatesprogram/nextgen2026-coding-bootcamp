@@ -1,4 +1,4 @@
 profile:
   name: fast
-prepare:
-  keep_holidays: false
+analysis:
+  generate_representative_image: false

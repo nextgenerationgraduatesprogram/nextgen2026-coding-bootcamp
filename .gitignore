@@ -12,6 +12,8 @@ __pycache__/
 # Data
 data/raw/*
 !data/raw/.gitkeep
+data/intermediate/*
+!data/intermediate/.gitkeep
 
 # Distribution / packaging
 .Python
