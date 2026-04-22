@@ -51,16 +51,24 @@ def create_demand_plots(
     }
 
 
-def run_report(cfg) -> dict:
+def run_report(cfg, ctx=None) -> dict:
     """Run the report stage with a composed configuration."""
-    results_dir = Path(cfg.paths.results_dir)
-    hourly_profile_csv = results_dir / "hourly_profile.csv"
-    high_demand_share_csv = results_dir / "high_demand_share_by_hour.csv"
+    if ctx is None:
+        analyze_dir = Path(cfg.paths.results_dir)
+        output_dir = Path(cfg.paths.results_dir)
+    else:
+        analyze_dir = ctx.run_dir / "analyze"
+        output_dir = ctx.run_dir / "report"
+
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    hourly_profile_csv = analyze_dir / "hourly_profile.csv"
+    high_demand_share_csv = analyze_dir / "high_demand_share_by_hour.csv"
 
     plots = create_demand_plots(
         hourly_profile_csv=hourly_profile_csv,
         high_demand_share_csv=high_demand_share_csv,
-        output_dir=results_dir,
+        output_dir=output_dir,
     )
 
     return {"plots": plots}
