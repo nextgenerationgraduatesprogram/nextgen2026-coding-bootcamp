@@ -27,13 +27,13 @@ git clone <your-fork-url>
 cd <repo-name>
 ```
 
-Then fetch the remote branches and create your own working branch from the project branch for your group, chose from one of `image-analysis`, `timeseries-analysis`, and `text-analysis`.
+Then fetch the remote branches and create your own working branch from the project branch for your group, chose `<problem>` from one of `image-analysis`, `timeseries-analysis`, and `text-analysis`.
 
 ```bash
 git fetch origin
 git branch -r
-git switch -c <your-name>/<short-task-name> origin/<problem-branch>
-git push -u origin <your-name>/<short-task-name>
+git switch -c <your-name>/session-4-<problem> origin/starter/session-4-<problem>
+git push -u origin <your-name>/session-4-<problem>
 ```
 
 You should now be working on your own branch, based on the problem branch for your project.
