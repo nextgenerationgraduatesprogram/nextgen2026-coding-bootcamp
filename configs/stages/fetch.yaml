@@ -1,3 +1,4 @@
 fetch:
-  dataset_name: sklearn_digits
-  raw_artifact_name: digits_raw.npz
+  dataset_name: bike_rental_demand
+  raw_artifact_name: bike_demand_raw.csv
+  source_data_path: data/source/bike_demand_source.csv

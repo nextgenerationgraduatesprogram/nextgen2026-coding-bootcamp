@@ -10,15 +10,19 @@ import pandas as pd
 logger = logging.getLogger(__name__)
 
 
-def _resolve_input_npz(cfg, ctx=None, input_npz: Path | None = None) -> Path:
-    if input_npz is not None:
-        return input_npz
+RAW_REQUIRED_COLUMNS = ["dteday", "hr", "cnt", "season", "weathersit"]
+PREPARED_COLUMNS = ["timestamp", "demand", "hour", "day_type", "season", "weather"]
+
+
+def _resolve_input_csv(cfg, ctx=None, input_csv: Path | None = None) -> Path:
+    if input_csv is not None:
+        return input_csv
 
     if ctx is not None:
         fetch_artifact = ctx.artifacts.get("fetch", {})
-        fetch_npz = fetch_artifact.get("raw_npz")
-        if fetch_npz:
-            return Path(fetch_npz)
+        fetch_csv = fetch_artifact.get("raw_csv")
+        if fetch_csv:
+            return Path(fetch_csv)
 
     return Path(cfg.paths.raw_dir) / str(cfg.fetch.raw_artifact_name)
 
@@ -28,67 +32,72 @@ def _copy_to_run(shared_path: Path, run_path: Path) -> None:
     shutil.copy2(shared_path, run_path)
 
 
-def run_prepare(cfg, ctx=None, input_npz: Path | None = None) -> dict:
-    raw_npz = _resolve_input_npz(cfg=cfg, ctx=ctx, input_npz=input_npz)
+def _validate_raw_columns(raw_table: pd.DataFrame) -> None:
+    missing_columns = [column for column in RAW_REQUIRED_COLUMNS if column not in raw_table.columns]
+    if missing_columns:
+        raise ValueError(
+            "Raw bike-demand table is missing required columns: "
+            + ", ".join(missing_columns)
+        )
+
+
+def run_prepare(cfg, ctx=None, input_csv: Path | None = None) -> dict:
+    raw_csv = _resolve_input_csv(cfg=cfg, ctx=ctx, input_csv=input_csv)
 
     shared_output_dir = Path(cfg.paths.intermediate_dir)
     shared_output_dir.mkdir(parents=True, exist_ok=True)
 
-    image_array_name = str(cfg.prepare.image_array_name)
-    metadata_name = str(cfg.prepare.metadata_name)
-    normalize_divisor = float(cfg.prepare.normalize_divisor)
-
-    shared_images_npy = shared_output_dir / image_array_name
-    shared_metadata_csv = shared_output_dir / metadata_name
+    prepared_table_name = str(cfg.prepare.prepared_table_name)
+    shared_prepared_csv = shared_output_dir / prepared_table_name
 
     logger.info("[prepare]")
-    logger.info("prepare:start input=%s", raw_npz)
+    logger.info("prepare:start input=%s", raw_csv)
 
-    with np.load(raw_npz) as raw:
-        images = raw["images"].astype(np.float32) / normalize_divisor
-        labels = raw["target"].astype(np.int64)
+    raw_table = pd.read_csv(raw_csv)
+    _validate_raw_columns(raw_table)
 
-    images = np.clip(images, 0.0, 1.0)
-
-    metadata = pd.DataFrame(
-        {
-            "image_id": np.arange(len(labels), dtype=int),
-            "label": labels.astype(int),
-        }
+    timestamp = pd.to_datetime(raw_table["dteday"]) + pd.to_timedelta(
+        raw_table["hr"].astype(int),
+        unit="h",
     )
 
-    np.save(shared_images_npy, images)
-    metadata.to_csv(shared_metadata_csv, index=False)
+    prepared = pd.DataFrame(
+        {
+            "timestamp": timestamp,
+            "demand": raw_table["cnt"].astype(int),
+            "hour": timestamp.dt.hour.astype(int),
+            "day_type": np.where(timestamp.dt.dayofweek < 5, "weekday", "weekend"),
+            "season": raw_table["season"].astype(str),
+            "weather": raw_table["weathersit"].astype(str),
+        }
+    )
+    prepared = prepared.sort_values("timestamp", ignore_index=True)
+    prepared["timestamp"] = prepared["timestamp"].dt.strftime("%Y-%m-%dT%H:%M:%S")
+    prepared.to_csv(shared_prepared_csv, index=False)
 
     if ctx is None:
-        output_images_npy = shared_images_npy
-        output_metadata_csv = shared_metadata_csv
+        output_prepared_csv = shared_prepared_csv
         copied_to_run = False
     else:
         run_stage_dir = ctx.run_dir / "prepare"
         run_stage_dir.mkdir(parents=True, exist_ok=True)
-        output_images_npy = run_stage_dir / image_array_name
-        output_metadata_csv = run_stage_dir / metadata_name
-        _copy_to_run(shared_images_npy, output_images_npy)
-        _copy_to_run(shared_metadata_csv, output_metadata_csv)
+        output_prepared_csv = run_stage_dir / prepared_table_name
+        _copy_to_run(shared_prepared_csv, output_prepared_csv)
         copied_to_run = True
 
     logger.info(
-        "prepare:finish images=%d image_shape=%s output_images=%s output_metadata=%s\n",
-        images.shape[0],
-        tuple(images.shape[1:]),
-        output_images_npy,
-        output_metadata_csv,
+        "prepare:finish rows=%d columns=%s output_prepared=%s\n",
+        len(prepared),
+        PREPARED_COLUMNS,
+        output_prepared_csv,
     )
 
     return {
-        "raw_npz": str(raw_npz),
-        "images_npy": str(output_images_npy),
-        "metadata_csv": str(output_metadata_csv),
-        "shared_images_npy": str(shared_images_npy),
-        "shared_metadata_csv": str(shared_metadata_csv),
-        "n_images": int(images.shape[0]),
-        "image_shape": list(images.shape[1:]),
-        "normalize_divisor": normalize_divisor,
+        "raw_csv": str(raw_csv),
+        "prepared_csv": str(output_prepared_csv),
+        "shared_prepared_csv": str(shared_prepared_csv),
+        "n_rows": int(len(prepared)),
+        "columns": PREPARED_COLUMNS,
+        "day_types": sorted(prepared["day_type"].unique().tolist()),
         "copied_to_run": copied_to_run,
     }

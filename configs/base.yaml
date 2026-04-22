@@ -7,33 +7,31 @@ paths:
   results_dir: results
 
 fetch:
-  dataset_name: sklearn_digits
-  raw_artifact_name: digits_raw.npz
+  dataset_name: bike_rental_demand
+  raw_artifact_name: bike_demand_raw.csv
+  source_data_path: data/source/bike_demand_source.csv
 
 prepare:
-  image_array_name: images.npy
-  metadata_name: metadata.csv
-  normalize_divisor: 16.0
+  prepared_table_name: prepared_demand.csv
 
 analysis:
   # Student task:
   # Fill these values in here and in `configs/stages/analyze.yaml`.
   # Final output names should be:
   # - dataset_overview.json
-  # - class_image_summary.csv
-  # - class_representatives.png
+  # - hourly_demand_profile.csv
+  # - weekday_weekend_daily_cycle.png
   dataset_overview_name: null
-  class_summary_name: null
-  representative_image_name: null
-  generate_representative_image: null
-  edge_threshold: null
+  hourly_profile_name: null
+  daily_cycle_plot_name: null
+  generate_daily_cycle_plot: null
 
 report:
   # Student task:
   # Fill these values in here and in `configs/stages/report.yaml`.
   # Final output name should be `report.md`.
   markdown_name: null
-  include_representative_image: null
+  include_daily_cycle_plot: null
 
 profile:
   name: base

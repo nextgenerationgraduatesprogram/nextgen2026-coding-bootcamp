@@ -4,51 +4,45 @@ import logging
 from pathlib import Path
 import shutil
 
-import numpy as np
 import pandas as pd
 
 logger = logging.getLogger(__name__)
 
-CLASS_IMAGE_SUMMARY_COLUMNS = [
-    "label",
-    "n_images",
-    "mean_intensity",
-    "std_intensity",
-    "mean_edge_density",
+HOURLY_DEMAND_PROFILE_COLUMNS = [
+    "day_type",
+    "hour",
+    "n_observations",
+    "mean_demand",
+    "median_demand",
+    "std_demand",
 ]
 
 DATASET_OVERVIEW_KEYS = [
     "dataset_name",
-    "n_images",
-    "n_classes",
-    "image_height",
-    "image_width",
-    "labels",
-    "images_per_class",
+    "n_rows",
+    "timestamp_start",
+    "timestamp_end",
+    "target_column",
+    "day_types",
+    "rows_per_day_type",
 ]
 
 
-def _resolve_prepare_inputs(
+def _resolve_prepare_input(
     cfg,
     ctx=None,
-    images_npy: Path | None = None,
-    metadata_csv: Path | None = None,
-) -> tuple[Path, Path]:
-    if images_npy is not None and metadata_csv is not None:
-        return images_npy, metadata_csv
+    prepared_csv: Path | None = None,
+) -> Path:
+    if prepared_csv is not None:
+        return prepared_csv
 
     if ctx is not None:
         prepare_artifact = ctx.artifacts.get("prepare", {})
-        prepare_images = prepare_artifact.get("images_npy")
-        prepare_metadata = prepare_artifact.get("metadata_csv")
-        if prepare_images and prepare_metadata:
-            return Path(prepare_images), Path(prepare_metadata)
+        prepared_table = prepare_artifact.get("prepared_csv")
+        if prepared_table:
+            return Path(prepared_table)
 
-    shared_dir = Path(cfg.paths.intermediate_dir)
-    return (
-        shared_dir / str(cfg.prepare.image_array_name),
-        shared_dir / str(cfg.prepare.metadata_name),
-    )
+    return Path(cfg.paths.intermediate_dir) / str(cfg.prepare.prepared_table_name)
 
 
 def _copy_to_run(shared_path: Path, run_path: Path) -> None:
@@ -76,41 +70,27 @@ def _validate_analysis_config(cfg) -> dict[str, object]:
         "dataset_overview_name": str(
             _require_value("analysis", "dataset_overview_name", analysis_cfg.dataset_overview_name)
         ),
-        "class_summary_name": str(
-            _require_value("analysis", "class_summary_name", analysis_cfg.class_summary_name)
+        "hourly_profile_name": str(
+            _require_value("analysis", "hourly_profile_name", analysis_cfg.hourly_profile_name)
         ),
-        "representative_image_name": str(
+        "daily_cycle_plot_name": str(
             _require_value(
                 "analysis",
-                "representative_image_name",
-                analysis_cfg.representative_image_name,
+                "daily_cycle_plot_name",
+                analysis_cfg.daily_cycle_plot_name,
             )
         ),
-        "generate_representative_image": bool(
+        "generate_daily_cycle_plot": bool(
             _require_value(
                 "analysis",
-                "generate_representative_image",
-                analysis_cfg.generate_representative_image,
+                "generate_daily_cycle_plot",
+                analysis_cfg.generate_daily_cycle_plot,
             )
-        ),
-        "edge_threshold": float(
-            _require_value("analysis", "edge_threshold", analysis_cfg.edge_threshold)
         ),
     }
 
 
-def calculate_edge_density(image: np.ndarray, threshold: float) -> float:
-    # Student task:
-    # 1. Compute the absolute pixel-to-pixel difference across rows and columns.
-    # 2. Count which differences are strictly greater than `threshold`.
-    # 3. Return the fraction of edge locations that exceed the threshold.
-    raise NotImplementedError(
-        "Implement `calculate_edge_density()` in "
-        "`src/nextgen2026_coding_bootcamp/steps/analyze.py`."
-    )
-
-
-def build_dataset_overview(images: np.ndarray, metadata: pd.DataFrame) -> dict:
+def build_dataset_overview(prepared: pd.DataFrame, dataset_name: str) -> dict:
     # Student task:
     # Build the JSON payload written to `dataset_overview.json`.
     # Required keys are listed in `DATASET_OVERVIEW_KEYS`.
@@ -120,31 +100,22 @@ def build_dataset_overview(images: np.ndarray, metadata: pd.DataFrame) -> dict:
     )
 
 
-def write_representative_image_montage(
-    images: np.ndarray,
-    metadata: pd.DataFrame,
-    output_path: Path,
-) -> None:
+def build_hourly_demand_profile(prepared: pd.DataFrame) -> pd.DataFrame:
     # Student task:
-    # Create a montage image with one representative digit per class and write it to
-    # `output_path`. `matplotlib` is already available in the project dependencies.
+    # Return one row per `day_type` and hour bucket with the required columns in
+    # `HOURLY_DEMAND_PROFILE_COLUMNS`.
     raise NotImplementedError(
-        "Implement `write_representative_image_montage()` in "
+        "Implement `build_hourly_demand_profile()` in "
         "`src/nextgen2026_coding_bootcamp/steps/analyze.py`."
     )
 
 
-def build_class_image_summary(
-    images: np.ndarray,
-    metadata: pd.DataFrame,
-    edge_threshold: float,
-) -> pd.DataFrame:
+def write_daily_cycle_plot(hourly_profile: pd.DataFrame, output_path: Path) -> None:
     # Student task:
-    # Return one row per label with the required columns in
-    # `CLASS_IMAGE_SUMMARY_COLUMNS`.
-    # Use `metadata['image_id']` to align rows with `images`.
+    # Plot the weekday and weekend mean-demand curves and write the chart to
+    # `output_path`. `matplotlib` is already available in the project dependencies.
     raise NotImplementedError(
-        "Implement `build_class_image_summary()` in "
+        "Implement `write_daily_cycle_plot()` in "
         "`src/nextgen2026_coding_bootcamp/steps/analyze.py`."
     )
 
@@ -152,14 +123,12 @@ def build_class_image_summary(
 def run_analyze(
     cfg,
     ctx=None,
-    images_npy: Path | None = None,
-    metadata_csv: Path | None = None,
+    prepared_csv: Path | None = None,
 ) -> dict:
-    prepared_images_npy, prepared_metadata_csv = _resolve_prepare_inputs(
+    prepared_table_csv = _resolve_prepare_input(
         cfg=cfg,
         ctx=ctx,
-        images_npy=images_npy,
-        metadata_csv=metadata_csv,
+        prepared_csv=prepared_csv,
     )
     analysis_cfg = _validate_analysis_config(cfg)
 
@@ -169,54 +138,49 @@ def run_analyze(
     shared_dataset_overview_json = (
         shared_output_dir / analysis_cfg["dataset_overview_name"]
     )
-    shared_class_image_summary_csv = (
-        shared_output_dir / analysis_cfg["class_summary_name"]
+    shared_hourly_demand_profile_csv = (
+        shared_output_dir / analysis_cfg["hourly_profile_name"]
     )
-    shared_class_representatives_png = (
-        shared_output_dir / analysis_cfg["representative_image_name"]
+    shared_weekday_weekend_daily_cycle_png = (
+        shared_output_dir / analysis_cfg["daily_cycle_plot_name"]
     )
 
     logger.info(
-        "[analyze]\nanalyze:start images=%s metadata=%s",
-        prepared_images_npy,
-        prepared_metadata_csv,
+        "[analyze]\nanalyze:start prepared_csv=%s",
+        prepared_table_csv,
     )
 
     # Student task:
     # Suggested shape for the implementation:
     #
-    # images = np.load(prepared_images_npy)
-    # metadata = pd.read_csv(prepared_metadata_csv)
-    # overview = build_dataset_overview(images=images, metadata=metadata)
-    # summary = build_class_image_summary(
-    #     images=images,
-    #     metadata=metadata,
-    #     edge_threshold=analysis_cfg["edge_threshold"],
+    # prepared = pd.read_csv(prepared_table_csv)
+    # overview = build_dataset_overview(
+    #     prepared=prepared,
+    #     dataset_name=str(cfg.fetch.dataset_name),
     # )
-    # if analysis_cfg["generate_representative_image"]:
-    #     write_representative_image_montage(...)
-    # summary.to_csv(shared_class_image_summary_csv, index=False)
+    # hourly_profile = build_hourly_demand_profile(prepared=prepared)
+    # if analysis_cfg["generate_daily_cycle_plot"]:
+    #     write_daily_cycle_plot(hourly_profile=hourly_profile, output_path=...)
+    # hourly_profile.to_csv(shared_hourly_demand_profile_csv, index=False)
     #
     # If `ctx` is provided, copy shared outputs into `ctx.run_dir / "analyze"` using
     # `_copy_to_run`, then return the run-scoped paths. Otherwise return shared paths.
     #
     # Expected return keys:
-    # - images_npy
-    # - metadata_csv
+    # - prepared_csv
     # - dataset_overview_json
-    # - class_image_summary_csv
-    # - class_representatives_png
+    # - hourly_demand_profile_csv
+    # - weekday_weekend_daily_cycle_png
     # - shared_dataset_overview_json
-    # - shared_class_image_summary_csv
-    # - shared_class_representatives_png
-    # - expected_class_summary_columns
-    # - edge_threshold
+    # - shared_hourly_demand_profile_csv
+    # - shared_weekday_weekend_daily_cycle_png
+    # - expected_hourly_profile_columns
     # - copied_to_run
     raise NotImplementedError(
         "Student task: implement `run_analyze()` so the analyze stage reads "
-        "`images.npy` and `metadata.csv`, writes `dataset_overview.json`, "
-        "`class_image_summary.csv`, and `class_representatives.png`, then "
-        "returns the artifact dictionary described in this file. Reference "
+        "`prepared_demand.csv`, writes `dataset_overview.json`, "
+        "`hourly_demand_profile.csv`, and `weekday_weekend_daily_cycle.png`, "
+        "then returns the artifact dictionary described in this file. Reference "
         "`src/nextgen2026_coding_bootcamp/steps/prepare.py`, "
         "`docs/01-project-brief.md`, and "
         "`docs/02-repo-workflow-and-missing-piece.md`."

@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This repository is a workshop scaffold for building the `analyze` and `report` stages of a small image-analysis workflow built on `sklearn.datasets.load_digits`.
+This repository is a workshop scaffold for building the `analyze` and `report` stages of a small time-series analysis workflow built around a vendored bike-rental-demand dataset.
 
 The starter state is intentional:
 
@@ -22,7 +22,7 @@ The workflow stages are fixed and must remain in this order:
 3. `analyze`
 4. `report`
 
-`fetch` materializes the raw digits dataset. `prepare` writes normalized images plus metadata. `analyze` must write the derived analysis artifacts. `report` must consume analyze outputs and turn them into a Markdown report.
+`fetch` materializes the raw bike-demand CSV. `prepare` writes the cleaned, analysis-ready demand table. `analyze` must write the derived analysis artifacts. `report` must consume analyze outputs and turn them into a Markdown report.
 
 ## Canonical Commands
 
@@ -73,9 +73,9 @@ Reference code for stage structure and artifact handoff lives in:
 
 ## Repo Boundaries
 
-This branch is an image-analysis exercise, not a model-training project. Do not add classifier training, CNN code, augmentation pipelines, notebooks as the main interface, async infrastructure, or a new workflow architecture. Keep the existing stage boundaries and artifact flow.
+This branch is a time-series analysis exercise, not a forecasting project. Do not add forecasting models, neural networks, notebooks as the main interface, async infrastructure, or a new workflow architecture. Keep the existing stage boundaries and artifact flow.
 
-`report` must consume outputs written by `analyze`. Do not duplicate class-summary calculations inside `report`, and do not bypass the analyze artifact contract just to make the report pass.
+`report` must consume outputs written by `analyze`. Do not duplicate hourly-demand calculations inside `report`, and do not bypass the analyze artifact contract just to make the report pass.
 
 ## Delegation Defaults
 
@@ -102,4 +102,4 @@ Every completed student change should be checked against:
 
 ## Escalate to a Human Immediately
 
-Escalate if the requested change would redesign the workflow, alter the scientific framing beyond the workshop task, introduce model training, or require a broad refactor outside the bounded analyze/report/config extension.
+Escalate if the requested change would redesign the workflow, alter the scientific framing beyond the workshop task, introduce forecasting/modeling work, or require a broad refactor outside the bounded analyze/report/config extension.

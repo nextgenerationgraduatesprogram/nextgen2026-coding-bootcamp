@@ -11,21 +11,21 @@ def test_run_workflow_calls_stages_in_order_and_stores_artifacts(monkeypatch):
 
     def fake_fetch(cfg, ctx):
         call_order.append("fetch")
-        return {"raw_npz": "fetch.npz"}
+        return {"raw_csv": "fetch.csv"}
 
     def fake_prepare(cfg, ctx):
         call_order.append("prepare")
-        assert ctx.artifacts["fetch"]["raw_npz"] == "fetch.npz"
-        return {"images_npy": "prepare.npy"}
+        assert ctx.artifacts["fetch"]["raw_csv"] == "fetch.csv"
+        return {"prepared_csv": "prepare.csv"}
 
     def fake_analyze(cfg, ctx):
         call_order.append("analyze")
-        assert ctx.artifacts["prepare"]["images_npy"] == "prepare.npy"
-        return {"class_image_summary_csv": "analyze.csv"}
+        assert ctx.artifacts["prepare"]["prepared_csv"] == "prepare.csv"
+        return {"hourly_demand_profile_csv": "analyze.csv"}
 
     def fake_report(cfg, ctx):
         call_order.append("report")
-        assert ctx.artifacts["analyze"]["class_image_summary_csv"] == "analyze.csv"
+        assert ctx.artifacts["analyze"]["hourly_demand_profile_csv"] == "analyze.csv"
         return {"report_markdown": "report.md"}
 
     monkeypatch.setattr("nextgen2026_coding_bootcamp.workflow.run_fetch", fake_fetch)
@@ -40,8 +40,8 @@ def test_run_workflow_calls_stages_in_order_and_stores_artifacts(monkeypatch):
     assert returned_ctx is ctx
     assert call_order == ["fetch", "prepare", "analyze", "report"]
     assert ctx.artifacts == {
-        "fetch": {"raw_npz": "fetch.npz"},
-        "prepare": {"images_npy": "prepare.npy"},
-        "analyze": {"class_image_summary_csv": "analyze.csv"},
+        "fetch": {"raw_csv": "fetch.csv"},
+        "prepare": {"prepared_csv": "prepare.csv"},
+        "analyze": {"hourly_demand_profile_csv": "analyze.csv"},
         "report": {"report_markdown": "report.md"},
     }

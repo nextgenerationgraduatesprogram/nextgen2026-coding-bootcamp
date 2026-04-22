@@ -14,6 +14,7 @@ data/raw/*
 !data/raw/.gitkeep
 data/intermediate/*
 !data/intermediate/.gitkeep
+data/source/
 
 # Distribution / packaging
 .Python

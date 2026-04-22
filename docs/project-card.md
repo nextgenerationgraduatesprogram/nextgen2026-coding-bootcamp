@@ -9,24 +9,24 @@ This workshop starts from a partial workflow. `fetch` and `prepare` already work
 Your completed workflow must produce these outputs:
 
 - `dataset_overview.json`
-- `class_image_summary.csv`
-- `class_representatives.png`
+- `hourly_demand_profile.csv`
+- `weekday_weekend_daily_cycle.png`
 - `report.md`
 
-`class_image_summary.csv` must contain these columns in order:
+`hourly_demand_profile.csv` must contain these columns in order:
 
 ```text
-label,n_images,mean_intensity,std_intensity,mean_edge_density
+day_type,hour,n_observations,mean_demand,median_demand,std_demand
 ```
 
 `report.md` must contain these headings:
 
 ```text
-# Digits Workflow Report
+# Bike Demand Workflow Report
 ## Dataset Overview
 ## Analyze Artifacts
-## Representative Digits
-## Digit Class Profiles
+## Daily Demand Cycle
+## Hourly Demand Profiles
 ```
 
 ### Step 2. Implement the missing files
@@ -56,4 +56,4 @@ Use these files for workflow shape, artifact handoff, and thin stage-script stru
 
 ### Step 4. Stay inside scope
 
-Do not add model training, CNN code, workflow redesign, notebook-first solutions, or broad refactors. `report` must read analyze artifacts instead of recomputing metrics.
+Do not add forecasting models, workflow redesign, notebook-first solutions, or broad refactors. `report` must read analyze artifacts instead of recomputing metrics.

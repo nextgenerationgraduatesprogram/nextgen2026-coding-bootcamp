@@ -1,4 +1,4 @@
 profile:
   name: fast
 analysis:
-  generate_representative_image: false
+  generate_daily_cycle_plot: false

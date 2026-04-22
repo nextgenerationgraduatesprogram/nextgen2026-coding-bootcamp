@@ -11,16 +11,17 @@ def test_load_config_reads_yaml_and_applies_overrides(tmp_path: Path):
         "run:\n"
         "  output_root: runs\n"
         "fetch:\n"
-        "  dataset_name: sklearn_digits\n"
+        "  dataset_name: bike_rental_demand\n"
+        "  source_data_path: data/source/bike_demand_source.csv\n"
     )
 
     cfg = load_config(
         config_path=config_path,
-        overrides=["run.output_root=custom-runs", "fetch.dataset_name=patched_digits"],
+        overrides=["run.output_root=custom-runs", "fetch.dataset_name=patched_bike_demand"],
     )
 
     assert cfg.run.output_root == "custom-runs"
-    assert cfg.fetch.dataset_name == "patched_digits"
+    assert cfg.fetch.dataset_name == "patched_bike_demand"
 
 
 def test_compose_config_merges_parts_in_order_and_applies_overrides(tmp_path: Path):
@@ -36,7 +37,7 @@ def test_compose_config_merges_parts_in_order_and_applies_overrides(tmp_path: Pa
         "run:\n"
         "  output_root: profiled-runs\n"
         "report:\n"
-        "  include_representative_image: true\n"
+        "  include_daily_cycle_plot: true\n"
     )
 
     cfg = compose_config(
@@ -47,4 +48,4 @@ def test_compose_config_merges_parts_in_order_and_applies_overrides(tmp_path: Pa
 
     assert cfg.run.output_root == "profiled-runs"
     assert cfg.report.markdown_name == "custom-report.md"
-    assert cfg.report.include_representative_image is True
+    assert cfg.report.include_daily_cycle_plot is True

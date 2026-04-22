@@ -4,10 +4,8 @@ from dataclasses import dataclass
 from pathlib import Path
 import subprocess
 import sys
-from types import SimpleNamespace
 
 from omegaconf import OmegaConf
-import numpy as np
 import pandas as pd
 import pytest
 
@@ -36,7 +34,17 @@ class ScratchPaths:
 
 
 @pytest.fixture()
-def workshop_cfg(tmp_path: Path):
+def repo_root() -> Path:
+    return Path(__file__).resolve().parents[1]
+
+
+@pytest.fixture()
+def source_dataset_path(repo_root: Path) -> Path:
+    return repo_root / "data" / "source" / "bike_demand_source.csv"
+
+
+@pytest.fixture()
+def workshop_cfg(tmp_path: Path, source_dataset_path: Path):
     return OmegaConf.create(
         {
             "run": {"output_root": str(tmp_path / "runs")},
@@ -46,33 +54,26 @@ def workshop_cfg(tmp_path: Path):
                 "results_dir": str(tmp_path / "results"),
             },
             "fetch": {
-                "dataset_name": "sklearn_digits",
-                "raw_artifact_name": "digits_raw.npz",
+                "dataset_name": "bike_rental_demand",
+                "raw_artifact_name": "bike_demand_raw.csv",
+                "source_data_path": str(source_dataset_path),
             },
             "prepare": {
-                "image_array_name": "images.npy",
-                "metadata_name": "metadata.csv",
-                "normalize_divisor": 16.0,
+                "prepared_table_name": "prepared_demand.csv",
             },
             "analysis": {
                 "dataset_overview_name": "dataset_overview.json",
-                "class_summary_name": "class_image_summary.csv",
-                "representative_image_name": "class_representatives.png",
-                "generate_representative_image": True,
-                "edge_threshold": 0.2,
+                "hourly_profile_name": "hourly_demand_profile.csv",
+                "daily_cycle_plot_name": "weekday_weekend_daily_cycle.png",
+                "generate_daily_cycle_plot": True,
             },
             "report": {
                 "markdown_name": "report.md",
-                "include_representative_image": True,
+                "include_daily_cycle_plot": True,
             },
             "profile": {"name": "test"},
         }
     )
-
-
-@pytest.fixture()
-def repo_root() -> Path:
-    return Path(__file__).resolve().parents[1]
 
 
 @pytest.fixture()
@@ -101,44 +102,10 @@ def run_cli(repo_root: Path):
 
 
 @pytest.fixture()
-def synthetic_summary_inputs():
-    images = np.array(
-        [
-            [[0.0, 0.0], [0.0, 0.0]],
-            [[0.0, 1.0], [0.0, 1.0]],
-            [[1.0, 1.0], [1.0, 1.0]],
-        ],
-        dtype=np.float32,
-    )
-    metadata = pd.DataFrame(
-        {
-            "image_id": [0, 1, 2],
-            "label": [0, 0, 1],
-        }
-    )
-    return {
-        "images": images,
-        "metadata": metadata,
-    }
+def make_raw_source_csv(tmp_path: Path):
+    def _make(rows: list[dict], name: str = "bike_source.csv") -> Path:
+        csv_path = tmp_path / name
+        pd.DataFrame(rows).to_csv(csv_path, index=False)
+        return csv_path
 
-
-@pytest.fixture()
-def synthetic_digits_dataset():
-    return SimpleNamespace(
-        images=np.array(
-            [
-                [[0.0, 1.0], [2.0, 3.0]],
-                [[4.0, 5.0], [6.0, 7.0]],
-            ],
-            dtype=np.float32,
-        ),
-        target=np.array([3, 7], dtype=np.int64),
-        target_names=np.arange(10, dtype=np.int64),
-        data=np.array(
-            [
-                [0.0, 1.0, 2.0, 3.0],
-                [4.0, 5.0, 6.0, 7.0],
-            ],
-            dtype=np.float32,
-        ),
-    )
+    return _make

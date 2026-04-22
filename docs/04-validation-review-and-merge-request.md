@@ -41,8 +41,8 @@ python - <<'PY'
 from pathlib import Path
 import pandas as pd
 latest = sorted(Path("runs").glob("*"), key=lambda p: p.stat().st_mtime, reverse=True)[0]
-summary = latest / "analyze" / "class_image_summary.csv"
-print(pd.read_csv(summary).head(10).to_string(index=False))
+profile = latest / "analyze" / "hourly_demand_profile.csv"
+print(pd.read_csv(profile).head(12).to_string(index=False))
 PY
 ```
 

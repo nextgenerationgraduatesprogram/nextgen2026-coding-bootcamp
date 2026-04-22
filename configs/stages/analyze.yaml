@@ -2,7 +2,6 @@ analysis:
   # Student task:
   # Mirror the final analyze settings from `configs/base.yaml` here.
   dataset_overview_name: null
-  class_summary_name: null
-  representative_image_name: null
-  generate_representative_image: null
-  edge_threshold: null
+  hourly_profile_name: null
+  daily_cycle_plot_name: null
+  generate_daily_cycle_plot: null

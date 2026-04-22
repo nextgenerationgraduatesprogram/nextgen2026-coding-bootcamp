@@ -6,7 +6,7 @@ This repository keeps the four-stage workflow shape intact: `fetch -> prepare ->
 
 ### Step 1. Run `fetch` and inspect the raw artifact
 
-Start by materializing the digits dataset and looking at the raw payload.
+Start by materializing the bike-demand dataset and looking at the raw payload.
 
 ```bash
 uv run python scripts/00_fetch.py --config configs/base.yaml --run-name fetch-only
@@ -14,22 +14,20 @@ LATEST_FETCH=$(ls -1dt runs/*fetch-only* | head -n1)
 find "$LATEST_FETCH" -maxdepth 3 -type f | sort
 python - <<'PY'
 from pathlib import Path
-import numpy as np
+import pandas as pd
 latest = sorted(Path("runs").glob("*fetch-only*"), key=lambda p: p.stat().st_mtime)[-1]
-with np.load(latest / "fetch" / "digits_raw.npz") as raw:
-    print("files =", raw.files)
-    print("images.shape =", raw["images"].shape)
-    print("target.shape =", raw["target"].shape)
-    print("target_names =", raw["target_names"].tolist())
-    print("data.shape =", raw["data"].shape)
+raw = pd.read_csv(latest / "fetch" / "bike_demand_raw.csv")
+print("shape =", raw.shape)
+print("columns =", raw.columns.tolist())
+print(raw.head().to_string(index=False))
 PY
 ```
 
-The working `fetch` stage gives you the unnormalized digits dataset. You do not need to change it.
+The working `fetch` stage gives you the raw bike-demand table. You do not need to change it.
 
 ### Step 2. Run `prepare` and inspect the prepared artifacts
 
-Then inspect the exact inputs that `analyze` must consume.
+Then inspect the exact input that `analyze` must consume.
 
 ```bash
 uv run python scripts/01_prepare.py --config configs/base.yaml --run-name prepare-only
@@ -37,27 +35,22 @@ LATEST_PREPARE=$(ls -1dt runs/*prepare-only* | head -n1)
 find "$LATEST_PREPARE" -maxdepth 3 -type f | sort
 python - <<'PY'
 from pathlib import Path
-import numpy as np
 import pandas as pd
 latest = sorted(Path("runs").glob("*prepare-only*"), key=lambda p: p.stat().st_mtime)[-1]
-images = np.load(latest / "prepare" / "images.npy")
-metadata = pd.read_csv(latest / "prepare" / "metadata.csv")
-print("images.shape =", images.shape)
-print("images.dtype =", images.dtype)
-print("images.min =", float(images.min()))
-print("images.max =", float(images.max()))
-print("metadata.columns =", metadata.columns.tolist())
-print(metadata.head().to_string(index=False))
-print(metadata["label"].value_counts().sort_index().to_string())
+prepared = pd.read_csv(latest / "prepare" / "prepared_demand.csv")
+print("shape =", prepared.shape)
+print("columns =", prepared.columns.tolist())
+print(prepared.head().to_string(index=False))
+print(prepared["day_type"].value_counts().sort_index().to_string())
 PY
 ```
 
 The current `prepare` contract is:
 
-- `images.npy`: shape `(1797, 8, 8)`, `float32`, normalized to `[0.0, 1.0]`
-- `metadata.csv`: columns `image_id` and `label`
+- `prepared_demand.csv`: columns `timestamp`, `demand`, `hour`, `day_type`, `season`, `weather`
+- timestamps are hourly ISO-8601 strings sorted ascending
 
-These are the only inputs the analyze stage needs.
+This is the only input the analyze stage needs.
 
 ### Step 3. Inspect the missing code
 
@@ -73,7 +66,7 @@ sed -n '1,220p' configs/stages/report.yaml
 
 The current scaffold state is intentional:
 
-- `analyze.py` resolves prepare inputs, validates config, and shows the expected helper structure
+- `analyze.py` resolves prepare input, validates config, and shows the expected helper structure
 - `report.py` resolves analyze inputs, validates config, and shows the expected helper structure
 - the analyze/report config blocks are placeholders that students must fill in
 
@@ -86,10 +79,9 @@ Use this structure for `analysis`:
 ```yaml
 analysis:
   dataset_overview_name: dataset_overview.json
-  class_summary_name: class_image_summary.csv
-  representative_image_name: class_representatives.png
-  generate_representative_image: true
-  edge_threshold: 0.2
+  hourly_profile_name: hourly_demand_profile.csv
+  daily_cycle_plot_name: weekday_weekend_daily_cycle.png
+  generate_daily_cycle_plot: true
 ```
 
 Use this structure for `report`:
@@ -97,7 +89,7 @@ Use this structure for `report`:
 ```yaml
 report:
   markdown_name: report.md
-  include_representative_image: true
+  include_daily_cycle_plot: true
 ```
 
 ### Step 5. Implement the analyze stage
@@ -105,26 +97,24 @@ report:
 Use the provided helper names and return contract. The exact internals are up to you, but the stage should follow this structure:
 
 ```python
-def run_analyze(cfg, ctx=None, images_npy=None, metadata_csv=None) -> dict:
-    prepared_images_npy, prepared_metadata_csv = _resolve_prepare_inputs(...)
+def run_analyze(cfg, ctx=None, prepared_csv=None) -> dict:
+    prepared_table_csv = _resolve_prepare_input(...)
     analysis_cfg = _validate_analysis_config(cfg)
 
     shared_output_dir = Path(cfg.paths.results_dir)
     shared_output_dir.mkdir(parents=True, exist_ok=True)
 
-    images = np.load(prepared_images_npy)
-    metadata = pd.read_csv(prepared_metadata_csv)
+    prepared = pd.read_csv(prepared_table_csv)
 
-    overview = build_dataset_overview(images=images, metadata=metadata)
-    summary = build_class_image_summary(
-        images=images,
-        metadata=metadata,
-        edge_threshold=analysis_cfg["edge_threshold"],
+    overview = build_dataset_overview(
+        prepared=prepared,
+        dataset_name=str(cfg.fetch.dataset_name),
     )
+    profile = build_hourly_demand_profile(prepared=prepared)
 
     # write dataset_overview.json
-    # write class_image_summary.csv
-    # optionally write class_representatives.png
+    # write hourly_demand_profile.csv
+    # optionally write weekday_weekend_daily_cycle.png
     # copy outputs into ctx.run_dir / "analyze" when ctx is provided
     # return the artifact dictionary expected by the workflow
 ```
@@ -154,8 +144,8 @@ Your report should include:
 
 - dataset overview values from `dataset_overview.json`
 - an analyze-artifact inventory
-- a representative image reference when enabled
-- a `Digit Class Profiles` Markdown table rendered from `class_image_summary.csv`
+- a daily-cycle plot reference when enabled
+- an `Hourly Demand Profiles` Markdown table rendered from `hourly_demand_profile.csv`
 
 ### Step 7. Write your own behavioural tests
 

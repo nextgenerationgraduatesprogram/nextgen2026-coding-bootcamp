@@ -1,4 +1,4 @@
-# Digits Image-Analysis Workshop Branch
+# Bike Demand Time-Series Workshop Branch
 
 This branch is the shared starter for a short workflow workshop. The repository already contains the first half of the pipeline, `fetch -> prepare`, and intentionally leaves `analyze` and `report` incomplete for students to build.
 

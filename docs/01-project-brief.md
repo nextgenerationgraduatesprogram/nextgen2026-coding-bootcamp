@@ -1,6 +1,6 @@
 # Project Brief
 
-This workshop uses the handwritten digits dataset that ships with `scikit-learn`, so the exercise stays fast and offline-friendly. The learning goal is to build two missing workflow stages from a bounded scaffold, not to train a classifier or redesign the project.
+This workshop uses a small vendored bike-rental-demand dataset, so the exercise stays fast and offline-friendly. The learning goal is to build two missing workflow stages from a bounded scaffold, not to build a forecasting model or redesign the project.
 
 The starter branch already completes `fetch` and `prepare`. Students must implement `analyze`, implement `report`, fill in the analyze/report config blocks, write their own tests, and then prove the full workflow works.
 
@@ -18,8 +18,8 @@ uv run python scripts/01_prepare.py --config configs/base.yaml --run-name prepar
 
 The starter expectations are:
 
-- `fetch` writes `digits_raw.npz`
-- `prepare` writes `images.npy` and `metadata.csv`
+- `fetch` writes `bike_demand_raw.csv`
+- `prepare` writes `prepared_demand.csv`
 - `analyze` is not implemented yet
 - `report` is not implemented yet
 - the full workflow should not be considered complete until you finish the missing stages
@@ -29,8 +29,8 @@ The starter expectations are:
 When you are done, the workflow should produce these analyze artifacts:
 
 - `dataset_overview.json`
-- `class_image_summary.csv`
-- `class_representatives.png`
+- `hourly_demand_profile.csv`
+- `weekday_weekend_daily_cycle.png`
 
 It should also produce this report artifact:
 
@@ -40,45 +40,44 @@ It should also produce this report artifact:
 
 ```json
 {
-  "dataset_name": "sklearn_digits",
-  "n_images": 1797,
-  "n_classes": 10,
-  "image_height": 8,
-  "image_width": 8,
-  "labels": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
-  "images_per_class": {
-    "0": 178
+  "dataset_name": "bike_rental_demand",
+  "n_rows": 96,
+  "timestamp_start": "2024-04-04T00:00:00",
+  "timestamp_end": "2024-04-07T23:00:00",
+  "target_column": "demand",
+  "day_types": ["weekday", "weekend"],
+  "rows_per_day_type": {
+    "weekday": 48
   }
 }
 ```
 
-`class_image_summary.csv` must have one row per digit class and these columns in order:
+`hourly_demand_profile.csv` must have one row per `day_type` and hour bucket and these columns in order:
 
 ```text
-label,n_images,mean_intensity,std_intensity,mean_edge_density
+day_type,hour,n_observations,mean_demand,median_demand,std_demand
 ```
 
 `report.md` must contain these headings:
 
 ```text
-# Digits Workflow Report
+# Bike Demand Workflow Report
 ## Dataset Overview
 ## Analyze Artifacts
-## Representative Digits
-## Digit Class Profiles
+## Daily Demand Cycle
+## Hourly Demand Profiles
 ```
 
 ### Step 3. Use the intended metric definitions
 
 Keep the metrics simple and reviewable.
 
-- `n_images`: the number of prepared images for the class
-- `mean_intensity`: the mean of the per-image mean intensities for that class
-- `std_intensity`: the population standard deviation of the per-image mean intensities for that class
-- `mean_edge_density`: the mean of the per-image edge densities for that class
-- `edge_density`: the fraction of horizontal and vertical neighboring pixel differences that are strictly greater than `edge_threshold`
+- `n_observations`: the number of prepared rows in the `day_type` and hour bucket
+- `mean_demand`: the mean demand for that bucket
+- `median_demand`: the median demand for that bucket
+- `std_demand`: the population standard deviation of demand for that bucket
 
-`report` must read these values from `class_image_summary.csv`. It must not recalculate them inside the report stage.
+`report` must read these values from `hourly_demand_profile.csv`. It must not recalculate them inside the report stage.
 
 ### Step 4. Implement the missing surfaces
 

@@ -30,24 +30,24 @@ def _validate_report_config(cfg) -> dict[str, object]:
         "dataset_overview_name": str(
             _require_value("analysis", "dataset_overview_name", analysis_cfg.dataset_overview_name)
         ),
-        "class_summary_name": str(
-            _require_value("analysis", "class_summary_name", analysis_cfg.class_summary_name)
+        "hourly_profile_name": str(
+            _require_value("analysis", "hourly_profile_name", analysis_cfg.hourly_profile_name)
         ),
-        "representative_image_name": str(
+        "daily_cycle_plot_name": str(
             _require_value(
                 "analysis",
-                "representative_image_name",
-                analysis_cfg.representative_image_name,
+                "daily_cycle_plot_name",
+                analysis_cfg.daily_cycle_plot_name,
             )
         ),
         "markdown_name": str(
             _require_value("report", "markdown_name", report_cfg.markdown_name)
         ),
-        "include_representative_image": bool(
+        "include_daily_cycle_plot": bool(
             _require_value(
                 "report",
-                "include_representative_image",
-                report_cfg.include_representative_image,
+                "include_daily_cycle_plot",
+                report_cfg.include_daily_cycle_plot,
             )
         ),
     }
@@ -55,12 +55,14 @@ def _validate_report_config(cfg) -> dict[str, object]:
 
 def _shared_analyze_paths(cfg, names: dict[str, object]) -> dict[str, Path | None]:
     results_dir = Path(cfg.paths.results_dir)
-    class_summary_path = results_dir / str(names["class_summary_name"])
-    representative_path = results_dir / str(names["representative_image_name"])
+    hourly_profile_path = results_dir / str(names["hourly_profile_name"])
+    daily_cycle_plot_path = results_dir / str(names["daily_cycle_plot_name"])
     return {
         "dataset_overview_json": results_dir / str(names["dataset_overview_name"]),
-        "class_image_summary_csv": class_summary_path,
-        "class_representatives_png": representative_path if representative_path.exists() else None,
+        "hourly_demand_profile_csv": hourly_profile_path,
+        "weekday_weekend_daily_cycle_png": (
+            daily_cycle_plot_path if daily_cycle_plot_path.exists() else None
+        ),
     }
 
 
@@ -70,12 +72,14 @@ def _ctx_analyze_paths(cfg, ctx, names: dict[str, object]) -> dict[str, Path | N
         return _shared_analyze_paths(cfg, names)
 
     overview_path = analyze_artifact.get("dataset_overview_json")
-    summary_path = analyze_artifact.get("class_image_summary_csv")
-    representative_path = analyze_artifact.get("class_representatives_png")
+    profile_path = analyze_artifact.get("hourly_demand_profile_csv")
+    daily_cycle_plot_path = analyze_artifact.get("weekday_weekend_daily_cycle_png")
     return {
         "dataset_overview_json": Path(overview_path),
-        "class_image_summary_csv": Path(summary_path) if summary_path else None,
-        "class_representatives_png": Path(representative_path) if representative_path else None,
+        "hourly_demand_profile_csv": Path(profile_path) if profile_path else None,
+        "weekday_weekend_daily_cycle_png": (
+            Path(daily_cycle_plot_path) if daily_cycle_plot_path else None
+        ),
     }
 
 
@@ -83,12 +87,12 @@ def _relative_path(target_path: Path, start_path: Path) -> str:
     return Path(os.path.relpath(target_path, start=start_path)).as_posix()
 
 
-def _format_summary_for_markdown(summary_df: pd.DataFrame) -> pd.DataFrame:
+def _format_profile_for_markdown(profile_df: pd.DataFrame) -> pd.DataFrame:
     # Student task:
     # Format integer columns as integers/strings and numeric metrics to 4 decimal places
     # before rendering the table into Markdown.
     raise NotImplementedError(
-        "Implement `_format_summary_for_markdown()` in "
+        "Implement `_format_profile_for_markdown()` in "
         "`src/nextgen2026_coding_bootcamp/steps/report.py`."
     )
 
@@ -102,13 +106,13 @@ def _dataframe_to_markdown_table(df: pd.DataFrame) -> str:
     )
 
 
-def build_digit_class_profiles_section(class_summary_csv: Path | None) -> list[str]:
+def build_hourly_demand_profiles_section(hourly_profile_csv: Path | None) -> list[str]:
     # Student task:
-    # Read `class_image_summary.csv` from analyze output and build the lines for the
-    # `## Digit Class Profiles` section. Raise `FileNotFoundError` if the summary is
+    # Read `hourly_demand_profile.csv` from analyze output and build the lines for the
+    # `## Hourly Demand Profiles` section. Raise `FileNotFoundError` if the profile is
     # missing instead of recomputing anything inside report.
     raise NotImplementedError(
-        "Implement `build_digit_class_profiles_section()` in "
+        "Implement `build_hourly_demand_profiles_section()` in "
         "`src/nextgen2026_coding_bootcamp/steps/report.py`."
     )
 
@@ -116,17 +120,17 @@ def build_digit_class_profiles_section(class_summary_csv: Path | None) -> list[s
 def build_report_markdown(
     output_dir: Path,
     dataset_overview_json: Path,
-    class_image_summary_csv: Path | None,
-    class_representatives_png: Path | None,
-    include_representative_image: bool,
+    hourly_demand_profile_csv: Path | None,
+    weekday_weekend_daily_cycle_png: Path | None,
+    include_daily_cycle_plot: bool,
 ) -> str:
     # Student task:
     # Build the report as a single Markdown string. The final report should contain:
-    # - `# Digits Workflow Report`
+    # - `# Bike Demand Workflow Report`
     # - `## Dataset Overview`
     # - `## Analyze Artifacts`
-    # - `## Representative Digits` (when enabled and present)
-    # - `## Digit Class Profiles`
+    # - `## Daily Demand Cycle` (when enabled and present)
+    # - `## Hourly Demand Profiles`
     raise NotImplementedError(
         "Implement `build_report_markdown()` in "
         "`src/nextgen2026_coding_bootcamp/steps/report.py`."
@@ -137,9 +141,9 @@ def _write_report(
     output_dir: Path,
     markdown_name: str,
     dataset_overview_json: Path,
-    class_image_summary_csv: Path | None,
-    class_representatives_png: Path | None,
-    include_representative_image: bool,
+    hourly_demand_profile_csv: Path | None,
+    weekday_weekend_daily_cycle_png: Path | None,
+    include_daily_cycle_plot: bool,
 ) -> Path:
     # Student task:
     # Create `output_dir`, render the report with `build_report_markdown()`, write it
@@ -153,7 +157,7 @@ def _write_report(
 def run_report(cfg, ctx=None) -> dict:
     names = _validate_report_config(cfg)
     markdown_name = str(names["markdown_name"])
-    include_representative_image = bool(names["include_representative_image"])
+    include_daily_cycle_plot = bool(names["include_daily_cycle_plot"])
 
     shared_output_dir = Path(cfg.paths.results_dir)
     shared_output_dir.mkdir(parents=True, exist_ok=True)
@@ -165,9 +169,9 @@ def run_report(cfg, ctx=None) -> dict:
         report_inputs = _ctx_analyze_paths(cfg, ctx, names)
 
     logger.info(
-        "[report]\nreport:start dataset_overview=%s class_summary=%s",
+        "[report]\nreport:start dataset_overview=%s hourly_profile=%s",
         report_inputs["dataset_overview_json"],
-        report_inputs["class_image_summary_csv"],
+        report_inputs["hourly_demand_profile_csv"],
     )
 
     # Student task:
@@ -177,9 +181,9 @@ def run_report(cfg, ctx=None) -> dict:
     #     output_dir=shared_output_dir,
     #     markdown_name=markdown_name,
     #     dataset_overview_json=shared_inputs["dataset_overview_json"],
-    #     class_image_summary_csv=shared_inputs["class_image_summary_csv"],
-    #     class_representatives_png=shared_inputs["class_representatives_png"],
-    #     include_representative_image=include_representative_image,
+    #     hourly_demand_profile_csv=shared_inputs["hourly_demand_profile_csv"],
+    #     weekday_weekend_daily_cycle_png=shared_inputs["weekday_weekend_daily_cycle_png"],
+    #     include_daily_cycle_plot=include_daily_cycle_plot,
     # )
     #
     # If `ctx` is provided, write a run-scoped copy under `ctx.run_dir / "report"`
@@ -187,14 +191,14 @@ def run_report(cfg, ctx=None) -> dict:
     #
     # Expected return keys:
     # - dataset_overview_json
-    # - class_image_summary_csv
-    # - class_representatives_png
+    # - hourly_demand_profile_csv
+    # - weekday_weekend_daily_cycle_png
     # - report_markdown
     # - shared_report_markdown
     # - copied_to_run
     raise NotImplementedError(
         "Student task: implement `run_report()` so the report stage reads analyze "
-        "artifacts and writes `report.md` without recomputing summary metrics. "
+        "artifacts and writes `report.md` without recomputing hourly metrics. "
         "Reference `docs/01-project-brief.md`, "
         "`docs/02-repo-workflow-and-missing-piece.md`, and "
         "`src/nextgen2026_coding_bootcamp/steps/prepare.py` for the stage structure."
