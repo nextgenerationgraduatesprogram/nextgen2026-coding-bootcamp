@@ -1,8 +1,9 @@
 # 01 Task Spec
 
-## Task Summary
+## Problem Definition
 
 - Request:
+- Problem to solve:
 - Intended repo change:
 - Why this task is appropriate for delegation:
 
@@ -26,10 +27,26 @@
 - Non-goals:
 - What must not change:
 
+## Design Feedback and Spec Revisions
+
+- Review comments:
+- Revisions made:
+- Remaining open issues:
+
+## Behavioural Cases
+
+- Case:
+  Input or setup:
+  Expected result:
+- Case:
+  Input or setup:
+  Expected result:
+
 ## Verification Plan
 
 | Layer | Planned check | Repo surface or command | What it proves | What still needs your review |
 | --- | --- | --- | --- | --- |
+| Behavioural tests |  |  |  |  |
 | Unit |  |  |  |  |
 | Integration |  |  |  |  |
 | End-to-end or smoke |  |  |  |  |

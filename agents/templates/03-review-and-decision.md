@@ -4,6 +4,7 @@
 
 - Task:
 - Approved task spec:
+- Approved implementation plan:
 
 ## Checks Run
 
@@ -13,6 +14,7 @@
 ## Diff Review
 
 - Scope matches approved task spec:
+- Scope matches approved implementation plan:
 - Unrelated edits:
 - Notes:
 

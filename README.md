@@ -1,10 +1,10 @@
 # Session 3 - Controlled Agent Collaboration for Workflow Extensions
 
-This repository shows you how to use AI coding agents inside the Bike Sharing workflow without giving up control of the work. We keep the agent inside a bounded, reviewable workflow instead of making it the center of the session.
+This repository shows you how to use AI coding agents inside the Bike Sharing workflow without giving up control of the work. The session teaches a bounded, reviewable workflow where the agent helps draft specs, tests, plans, and review artifacts, while you keep control of approval, interpretation, and merge decisions.
 
 Core operating rule:
 
-`assess task -> decide how to check it -> specify it -> load context -> delegate -> verify/integrate -> manage git -> improve process`
+`define the problem -> clarify and approve the specification -> design behavioural tests -> implement those tests -> design the implementation plan -> implement the plan and supporting tests -> review and commit -> refine the workflow`
 
 ## Start Here
 
@@ -105,7 +105,8 @@ uv run python scripts/run_workflow.py --profile base --run-name baseline-check
 ## What This Session Teaches
 
 - choosing a bounded workflow change inside `fetch -> prepare -> analyze -> report`
-- matching review burden to task risk before implementation begins
-- writing task contracts and loading only the context the agent needs
-- using a plan-first delegation loop and verifying the result in layers
-- keeping git discipline and turning repeated lessons into durable repo improvements
+- clarifying the problem specification before feature work begins
+- defining executable behavioural tests before feature implementation
+- designing an implementation plan with deliberate context and file references
+- reviewing the work against specs, tests, artifacts, and git state before commit
+- turning repeated lessons into durable repo instructions, tests, and templates

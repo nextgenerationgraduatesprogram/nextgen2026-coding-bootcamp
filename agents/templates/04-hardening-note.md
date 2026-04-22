@@ -4,6 +4,7 @@
 
 - Task:
 - Review and decision reference:
+- Branch outcome:
 
 ## Durable Instructions to Move Into `AGENTS.md`
 

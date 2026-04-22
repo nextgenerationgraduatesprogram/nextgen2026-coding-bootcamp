@@ -4,16 +4,17 @@
 
 This guide answers the opening question for Session 3: what are you actually doing in this workshop, and what is the collaboration pattern between you and the coding agent?
 
-The short answer is: choose a bounded task, put it on its own branch, have the agent draft structured artifacts into `agents/docs/`, review those drafts, and only then approve implementation or merge decisions. The longer answer is that the workshop is teaching a supervision habit, not just a prompting habit.
+The short answer is: choose a bounded task, put it on its own branch, have the agent help draft and revise structured artifacts into `agents/docs/`, implement executable behavioural tests before feature code, and only then approve implementation or commit decisions. Prefer to start a fresh chat between stages so each phase begins from the approved artifact rather than from stale conversational context. The longer answer is that the workshop is teaching a supervision habit, not just a prompting habit.
 
 ## Why this matters
 
 The easiest way for an agent workshop to go off the rails is to collapse into “ask for code, then hope the result looks plausible.” That produces motion, but not necessarily understanding. In research-flavored workflow code, the dangerous failures are often not syntax failures. They are scope failures, interpretation failures, stage-boundary mistakes, and approvals that happen before you can explain what changed.
 
-This session tries to prevent that. The prompt-first model is designed to shift the clerical work of drafting specs, briefs, and review notes onto the agent while keeping the important decisions with you:
+This session tries to prevent that. The specification-first model is designed to shift the clerical work of drafting specs, plans, and review notes onto the agent while keeping the important decisions with you:
 
 - which task is worth doing
 - what the task is allowed to touch
+- what behaviour must be made executable before implementation
 - how the result will be verified
 - when the draft is good enough to approve
 - whether the final result should be accepted, revised, or rejected
@@ -90,7 +91,7 @@ Using the task slug you chose earlier, send a prompt like this:
 Read `AGENTS.md` and `docs/00-session-overview.md` first.
 Convert the task idea below into the format specified in `@01-task-spec.md`.
 Place the result in `agents/docs/<task-slug>-01-task-spec.md` for review.
-Use the current repo structure, stage ownership, and tests to fill risk, scope, and verification.
+Use the current repo structure, stage ownership, and tests to fill problem definition, risk, scope, likely file surfaces, and behavioural expectations.
 Do not implement code.
 
 Task idea:
@@ -110,6 +111,8 @@ Do not implement code.
 
 The point here is not that this exact task is magical. The point is that you start the session by seeing the agent produce a reviewable structured draft instead of immediately producing code.
 
+As the session progresses, keep one more habit in mind: once a stage output is approved, the next stage should usually start in a fresh chat with the approved artifact and the relevant repo files. That reduces context leakage from earlier revisions or abandoned ideas.
+
 ## Outputs
 
 - The session work is isolated on a branch dedicated to the bounded task.
@@ -121,9 +124,10 @@ The point here is not that this exact task is magical. The point is that you sta
 1. Why is it useful to have the agent draft the structured artifact instead of having you fill it in manually?
 2. What would go wrong if the first prompt asked for code instead of for a task spec draft?
 3. Which parts of the session should remain firmly in your hands even if the agent drafts the paperwork?
-4. What would count as evidence that you understand the workflow rather than just following the steps mechanically?
-5. Where in the session is the review gate most likely to be skipped, and why?
+4. How do `AGENTS.md` and the docs play different roles at the start of the session?
+5. What would count as evidence that you understand the workflow rather than just following the steps mechanically?
+6. Where in the session is the review gate most likely to be skipped, and why?
 
 ## Next
 
-Continue to [01 — Risk, Task Types, and Review Burden](./01-agent-tasks.md).
+Continue to [01 — Problem Definition and Specification](./01-specification.md).
