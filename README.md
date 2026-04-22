@@ -27,7 +27,7 @@ git clone <your-fork-url>
 cd <repo-name>
 ```
 
-Then fetch the remote branches and create your own working branch from the project branch for your group.
+Then fetch the remote branches and create your own working branch from the project branch for your group, chose from one of `image-analysis`, `timeseries-analysis`, and `text-analysis`.
 
 ```bash
 git fetch origin
