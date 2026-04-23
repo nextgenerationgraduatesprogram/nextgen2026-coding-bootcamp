@@ -15,13 +15,15 @@ def _archive_name_from_url(source_url: str) -> str:
     return name or "dataset.zip"
 
 
-def _extract_archive_member(archive_path: Path, archive_member: str, output_csv: Path) -> None:
+def _extract_archive_member(
+    archive_path: Path, archive_member: str, output_csv: Path
+) -> None:
     with ZipFile(archive_path) as zf:
         with zf.open(archive_member) as src, output_csv.open("wb") as dst:
             dst.write(src.read())
 
 
-def run_fetch(cfg) -> dict:
+def run_fetch(cfg, ctx=None) -> dict:
     source_url = str(cfg.fetch.source_url)
     archive_member = str(cfg.fetch.archive_member)
 

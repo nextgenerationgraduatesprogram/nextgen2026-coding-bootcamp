@@ -33,7 +33,7 @@ PREPARED_COLUMNS = [
 ]
 
 
-def run_prepare(cfg) -> dict:
+def run_prepare(cfg, ctx=None) -> dict:
     source_csv = Path(cfg.paths.raw_dir) / str(cfg.fetch.archive_member)
 
     output_dir = Path(cfg.paths.intermediate_dir)

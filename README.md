@@ -1,4 +1,10 @@
-# Session 2 - Reproducible Research Workflow
+# NextGen Coding Bootcamp
+
+This four-session boot camp introduces the core workflow skills needed to run a computational research project from setup to reproducible handoff. We will learn how to structure a research repository, run analyses through scripts and configuration, capture logs and outputs, use coding tools such as Copilot to accelerate development, and produce work that another researcher can rerun, review, and extend.
+
+---
+
+# 🚀 Session 2 - Reproducible Research Workflow
 
 Session 2 shows how to turn notebook-first exploration into an auditable workflow that can support defensible research claims. The goal is methodological clarity: a reviewer should be able to trace how assumptions, data transformations, and outputs connect from start to finish.
 
@@ -42,23 +48,27 @@ Follow the core path in sequence because each chapter introduces prerequisites f
 7. [Workflow Orchestration](./docs/06-orchestration.md)
 8. [Testing the Workflow](./docs/07-testing.md)
 
-## Appendices
+---
 
-Use appendices only after the core path is stable. They scale or operationalize the workflow contract, but they do not replace core reproducibility fundamentals.
+## 🤖 Working with AI Coding Agents
 
-9. [Experiment Tracking](./docs/08-appendix-experiment-tracking.md)
-10. [Workflow Engines](./docs/09-appendix-workflow-engines.md)
-11. [Multiruns](./docs/10-appendix-multiruns.md)
-12. [Hydra](./docs/11-appendix-hydra.md)
-13. [Automated Testing on Git Push](./docs/12-appendix-git-push-testing.md)
+This repository is optimized for collaboration with AI agents.
 
-## How To Read This Repo
+### 📜 Rules for Agents
+If you are using an AI agent (e.g., GitHub Copilot, Cursor), please direct it to read the **[CODING_AGENT_RULES.md](./CODING_AGENT_RULES.md)** file immediately. These rules ensure the agent follows the project's architectural standards:
+- **Automatic Syncing**: The rules require the agent to fetch from `upstream` at the start of every session to ensure they are working with the latest workshop material.
+- **Project Structure**: Reusable logic must live in `src/`, with thin interfaces in `scripts/`.
+- **Reproducibility**: Notebooks must import from the package instead of redefining logic.
+- **Safety & Explainability**: Safe, non-destructive command execution with explicit user approval. Agents must explain the meaning and impact of any destructive code before running it.
 
-Treat the repository as a training scaffold for research workflow design, not as a static template. The discipline is to validate each checkpoint before moving forward so methodological assumptions remain explicit.
+## 📚 Repository Structure
 
-Treat each chapter as a checkpointed method lesson:
+- `src/`: Durable, reusable research logic (the "engine").
+- `scripts/`: Task-specific scripts that call the engine.
+- `notebooks/`: Exploratory analysis and visualization.
+- `data/raw/`: Read-only input data.
+- `results/`: Generated outputs (ignored by Git, except for `.gitkeep`).
 
-- read rationale first
-- implement the chapter snapshot
-- run the checkpoint commands
-- move forward only after the checkpoint passes
+## 📖 Session Guides
+- If you are on the **main branch**: Start with the **[Development Environment Setup](./docs/00-development-environment.md)**.
+- If you are on a **session branch**: Start with the **[Session Overview](./docs/00-session-overview.md)**.
